@@ -30,6 +30,8 @@ const AddExpensePage: React.FC = () => {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [receiptImage, setReceiptImage] = useState('');
+  const [currency, setCurrency] = useState('CNY');
+  const [exchangeRate, setExchangeRate] = useState('1');
 
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
@@ -55,8 +57,35 @@ const AddExpensePage: React.FC = () => {
     'other',
   ];
 
+  const currencyOptions = [
+    { code: 'CNY', symbol: '¥', name: '人民币' },
+    { code: 'USD', symbol: '$', name: '美元' },
+    { code: 'EUR', symbol: '€', name: '欧元' },
+    { code: 'JPY', symbol: '¥', name: '日元' },
+    { code: 'GBP', symbol: '£', name: '英镑' },
+    { code: 'HKD', symbol: 'HK$', name: '港币' },
+  ];
+
+  const rateNum = parseFloat(exchangeRate) || 0;
+  const amountNum = parseFloat(amount) || 0;
+  const cnyAmount =
+    currency === 'CNY' ? amountNum : amountNum * rateNum;
+
   const handleCategorySelect = useCallback((cat: ExpenseCategory) => {
     setCategory(cat);
+  }, []);
+
+  const handleCurrencyChange = useCallback((code: string) => {
+    setCurrency(code);
+    const defaults: Record<string, string> = {
+      CNY: '1',
+      USD: '7.2',
+      EUR: '7.8',
+      JPY: '0.05',
+      GBP: '9.1',
+      HKD: '0.92',
+    };
+    setExchangeRate(defaults[code] || '1');
   }, []);
 
   const handleMemberToggle = useCallback((userId: string) => {
@@ -100,9 +129,13 @@ const AddExpensePage: React.FC = () => {
       return;
     }
 
-    const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
       Taro.showToast({ title: '请输入金额', icon: 'none' });
+      return;
+    }
+
+    if (currency !== 'CNY' && (!rateNum || rateNum <= 0)) {
+      Taro.showToast({ title: '请输入有效汇率', icon: 'none' });
       return;
     }
 
@@ -118,7 +151,7 @@ const AddExpensePage: React.FC = () => {
 
     addExpense({
       tripId: currentTripId,
-      amount: amountNum,
+      amount: Number(cnyAmount.toFixed(2)),
       category,
       description: description.trim(),
       payerId,
@@ -126,6 +159,8 @@ const AddExpensePage: React.FC = () => {
       splitType,
       note: note.trim() || undefined,
       receiptImage: receiptImage || undefined,
+      currency,
+      exchangeRate: currency === 'CNY' ? 1 : rateNum,
       createdBy: currentUser.id,
     });
 
@@ -135,7 +170,10 @@ const AddExpensePage: React.FC = () => {
     }, 1000);
   }, [
     currentTripId,
-    amount,
+    amountNum,
+    rateNum,
+    currency,
+    cnyAmount,
     description,
     category,
     payerId,
@@ -191,6 +229,46 @@ const AddExpensePage: React.FC = () => {
               />
             </View>
           </View>
+        </View>
+
+        <View className={styles.section}>
+          <View className={styles.sectionHeader}>
+            <Text className={styles.sectionTitle}>币种与汇率</Text>
+          </View>
+          <View className={styles.currencyRow}>
+            {currencyOptions.map((opt) => (
+              <View
+                key={opt.code}
+                className={`${styles.currencyChip} ${currency === opt.code ? styles.currencyActive : ''}`}
+                onClick={() => handleCurrencyChange(opt.code)}
+              >
+                <Text className={styles.currencySymbol}>{opt.symbol}</Text>
+                <Text className={styles.currencyCode}>{opt.code}</Text>
+              </View>
+            ))}
+          </View>
+          {currency !== 'CNY' && (
+            <View className={styles.inputRow}>
+              <Text className={styles.inputLabel}>汇率</Text>
+              <View className={styles.inputContent}>
+                <Input
+                  className={styles.textInput}
+                  type="digit"
+                  placeholder={`1 ${currency} = ? CNY`}
+                  placeholderClass={styles.inputPlaceholder}
+                  value={exchangeRate}
+                  onInput={(e) => setExchangeRate(e.detail.value)}
+                />
+              </View>
+            </View>
+          )}
+          {currency !== 'CNY' && amountNum > 0 && rateNum > 0 && (
+            <View className={styles.cnyPreview}>
+              <Text className={styles.cnyPreviewText}>
+                折合人民币 ¥{cnyAmount.toFixed(2)} 元（以此结算）
+              </Text>
+            </View>
+          )}
         </View>
 
         <View className={styles.section}>

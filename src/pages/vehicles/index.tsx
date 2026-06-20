@@ -21,6 +21,16 @@ const VehiclesPage: React.FC = () => {
 
   const vehicles = currentTrip?.vehicles || [];
   const members = currentTrip?.members || [];
+  const expenses = currentTrip?.expenses || [];
+
+  const getOwnerFuelCost = useCallback(
+    (ownerId: string) => {
+      return expenses
+        .filter((e) => e.category === 'fuel' && e.payerId === ownerId)
+        .reduce((sum, e) => sum + e.amount, 0);
+    },
+    [expenses]
+  );
 
   const handleAddVehicle = useCallback(() => {
     Taro.showToast({ title: '添加车辆功能开发中', icon: 'none' });
@@ -90,7 +100,7 @@ const VehiclesPage: React.FC = () => {
                     </View>
                     <View className={styles.infoItem}>
                       <Text className={styles.infoValue}>
-                        ¥{formatMoney(vehicle.totalFuelCost || 0)}
+                        ¥{formatMoney(getOwnerFuelCost(vehicle.ownerId))}
                       </Text>
                       <Text className={styles.infoLabel}>累计油费</Text>
                     </View>

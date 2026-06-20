@@ -203,6 +203,61 @@
   color: $color-text-tertiary;
 }
 
+.currencyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+}
+
+.currencyChip {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  border: 2rpx solid transparent;
+  transition: all $transition-fast;
+}
+
+.currencyActive {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: $color-primary;
+}
+
+.currencySymbol {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.currencyActive .currencySymbol {
+  color: $color-primary;
+}
+
+.currencyCode {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.currencyActive .currencyCode {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.cnyPreview {
+  padding: $spacing-sm $spacing-lg $spacing-md;
+}
+
+.cnyPreviewText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: rgba(255, 107, 53, 0.08);
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-sm;
+  display: inline-block;
+}
+
 .bottomBar {
   position: fixed;
   left: 0;

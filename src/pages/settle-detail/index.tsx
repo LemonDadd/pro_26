@@ -18,7 +18,7 @@ import Avatar from '@/components/Avatar';
 import styles from './index.module.scss';
 
 const SettleDetailPage: React.FC = () => {
-  const { trips, currentTripId, settledItems, toggleSettled } = useTripStore();
+  const { trips, currentTripId, toggleSettled, isItemSettled } = useTripStore();
 
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
@@ -34,8 +34,8 @@ const SettleDetailPage: React.FC = () => {
   );
 
   const settlements = useMemo(
-    () => simplifyDebts(balances),
-    [balances]
+    () => simplifyDebts(balances, members),
+    [balances, members]
   );
 
   const totalExpense = useMemo(
@@ -54,9 +54,9 @@ const SettleDetailPage: React.FC = () => {
   );
 
   const handleTransfer = useCallback(
-    (item: { from: string; to: string; amount: number }) => {
-      const fromUser = getUserById(item.from);
-      const toUser = getUserById(item.to);
+    (item: { fromUserId: string; toUserId: string; amount: number }) => {
+      const fromUser = getUserById(item.fromUserId);
+      const toUser = getUserById(item.toUserId);
       Taro.showModal({
         title: '转账提示',
         content: `请向 ${toUser?.name || 'TA'} 转账 ¥${formatMoney(
@@ -71,14 +71,14 @@ const SettleDetailPage: React.FC = () => {
 
   const handleSettle = useCallback(
     (itemId: string) => {
+      const wasSettled = isItemSettled(itemId);
       toggleSettled(itemId);
-      const isSettled = settledItems.includes(itemId);
       Taro.showToast({
-        title: isSettled ? '已取消结清' : '已标记结清',
+        title: wasSettled ? '已取消结清' : '已标记结清',
         icon: 'success',
       });
     },
-    [settledItems, toggleSettled]
+    [isItemSettled, toggleSettled]
   );
 
   const handleShare = useCallback(() => {
@@ -132,11 +132,11 @@ const SettleDetailPage: React.FC = () => {
             <Text className={styles.sectionTitle}>转账明细</Text>
           </View>
           <View className={styles.settleList}>
-            {settlements.map((item, index) => {
-              const fromUser = getUserById(item.from);
-              const toUser = getUserById(item.to);
-              const itemId = `${item.from}-${item.to}-${index}`;
-              const isSettled = settledItems.includes(itemId);
+            {settlements.map((item) => {
+              const fromUser = getUserById(item.fromUserId);
+              const toUser = getUserById(item.toUserId);
+              const itemId = `${item.fromUserId}-${item.toUserId}-${item.amount}`;
+              const isSettled = isItemSettled(itemId);
 
               return (
                 <View key={itemId} className={styles.settleItem}>

@@ -28,6 +28,8 @@ interface TripStore {
 
   markSettled: (fromUserId: string, toUserId: string, amount: number) => void;
   isSettled: (fromUserId: string, toUserId: string, amount: number) => boolean;
+  toggleSettled: (key: string) => void;
+  isItemSettled: (key: string) => boolean;
 
   addActivity: (activity: Omit<Activity, 'id' | 'createdAt'>) => void;
   getActivitiesByTrip: (tripId: string) => Activity[];
@@ -178,6 +180,22 @@ export const useTripStore = create<TripStore>((set, get) => ({
 
   isSettled: (fromUserId, toUserId, amount) => {
     const key = `${fromUserId}-${toUserId}-${amount}`;
+    return get().settledItems[key] || false;
+  },
+
+  toggleSettled: (key) => {
+    set((state) => {
+      const next = { ...state.settledItems };
+      if (next[key]) {
+        delete next[key];
+      } else {
+        next[key] = true;
+      }
+      return { settledItems: next };
+    });
+  },
+
+  isItemSettled: (key) => {
     return get().settledItems[key] || false;
   },
 
