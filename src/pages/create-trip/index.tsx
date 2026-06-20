@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import styles from './index.module.scss';
 
 const CreateTripPage: React.FC = () => {
   const router = useRouter();
-  const { addTrip, currentUser } = useTripStore();
+  const { addTrip, updateTrip, currentUser, trips } = useTripStore();
 
   const [title, setTitle] = useState('');
   const [destination, setDestination] = useState('');
@@ -23,10 +23,26 @@ const CreateTripPage: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
 
+  const tripId = router.params.tripId;
   const templateId = router.params.templateId;
+  const isEditMode = !!tripId;
 
-  React.useEffect(() => {
-    if (templateId) {
+  const editingTrip = isEditMode
+    ? trips.find((t) => t.id === tripId)
+    : undefined;
+
+  useEffect(() => {
+    if (isEditMode && editingTrip) {
+      setTitle(editingTrip.title);
+      setDestination(editingTrip.destination);
+      setStartDate(editingTrip.startDate);
+      setEndDate(editingTrip.endDate);
+      setSelectedTemplateId(editingTrip.templateId || '');
+    }
+  }, [isEditMode, editingTrip]);
+
+  useEffect(() => {
+    if (!isEditMode && templateId) {
       setSelectedTemplateId(templateId);
       const template = tripTemplates.find((t) => t.id === templateId);
       if (template) {
@@ -34,7 +50,7 @@ const CreateTripPage: React.FC = () => {
         setDestination(template.name);
       }
     }
-  }, [templateId]);
+  }, [templateId, isEditMode]);
 
   const handleTemplateSelect = useCallback((id: string) => {
     setSelectedTemplateId(id);
@@ -73,39 +89,57 @@ const CreateTripPage: React.FC = () => {
 
     const template = tripTemplates.find((t) => t.id === selectedTemplateId);
 
-    addTrip({
-      title: title.trim(),
-      destination: destination.trim(),
-      startDate,
-      endDate,
-      leaderId: currentUser.id,
-      members: [currentUser],
-      days: template?.sampleDays?.map((d, i) => ({
-        ...d,
-        day: i + 1,
-        date: '',
-      })),
-      status: 'active',
-      templateId: selectedTemplateId || undefined,
-    });
+    if (isEditMode && tripId) {
+      updateTrip(tripId, {
+        title: title.trim(),
+        destination: destination.trim(),
+        startDate,
+        endDate,
+        templateId: selectedTemplateId || undefined,
+      });
 
-    Taro.showToast({ title: '创建成功', icon: 'success' });
-    setTimeout(() => {
-      Taro.switchTab({ url: '/pages/home/index' });
-    }, 1000);
+      Taro.showToast({ title: '保存成功', icon: 'success' });
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } else {
+      addTrip({
+        title: title.trim(),
+        destination: destination.trim(),
+        startDate,
+        endDate,
+        leaderId: currentUser.id,
+        members: [currentUser],
+        days: template?.sampleDays?.map((d, i) => ({
+          ...d,
+          day: i + 1,
+          date: '',
+        })),
+        status: 'active',
+        templateId: selectedTemplateId || undefined,
+      });
+
+      Taro.showToast({ title: '创建成功', icon: 'success' });
+      setTimeout(() => {
+        Taro.switchTab({ url: '/pages/home/index' });
+      }, 1000);
+    }
   }, [
     title,
     destination,
     startDate,
     endDate,
     selectedTemplateId,
+    isEditMode,
+    tripId,
+    updateTrip,
     addTrip,
     currentUser,
   ]);
 
   return (
     <View className={styles.page}>
-      <NavBar title="创建行程" showBack />
+      <NavBar title={isEditMode ? '编辑行程' : '创建行程'} showBack />
       <ScrollView scrollY>
         <View className={styles.section}>
           <View className={styles.inputRow}>
@@ -200,7 +234,9 @@ const CreateTripPage: React.FC = () => {
 
       <View className={styles.bottomBar}>
         <Button className={styles.submitBtn} onClick={handleSubmit}>
-          <Text className={styles.submitBtnText}>创建行程</Text>
+          <Text className={styles.submitBtnText}>
+            {isEditMode ? '保存修改' : '创建行程'}
+          </Text>
         </Button>
       </View>
     </View>

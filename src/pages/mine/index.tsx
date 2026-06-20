@@ -29,8 +29,10 @@ const MinePage: React.FC = () => {
         Taro.navigateTo({ url: '/pages/vehicles/index' }),
       templates: () =>
         Taro.navigateTo({ url: '/pages/templates/index' }),
-      settings: () => Taro.showToast({ title: '设置功能开发中', icon: 'none' }),
-      help: () => Taro.showToast({ title: '帮助功能开发中', icon: 'none' }),
+      settings: () =>
+        Taro.navigateTo({ url: '/pages/settings/index' }),
+      help: () =>
+        Taro.navigateTo({ url: '/pages/help/index' }),
       about: () => Taro.showToast({ title: '关于我们', icon: 'none' }),
     };
     actions[key]?.();

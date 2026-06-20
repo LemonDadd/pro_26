@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
+  Image,
+  Input,
 } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
@@ -12,7 +14,11 @@ import { formatMoney } from '@/utils/format';
 import styles from './index.module.scss';
 
 const MembersPage: React.FC = () => {
-  const { trips, currentTripId } = useTripStore();
+  const { trips, currentTripId, addMember } = useTripStore();
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [newNickname, setNewNickname] = useState('');
 
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
@@ -23,18 +29,62 @@ const MembersPage: React.FC = () => {
   const expenses = currentTrip?.expenses || [];
 
   const handleAddMember = useCallback(() => {
-    Taro.showToast({ title: '邀请码功能开发中', icon: 'none' });
+    Taro.showActionSheet({
+      itemList: ['手动添加', '扫码加入', '分享邀请'],
+      success: (res) => {
+        const actions = [
+          () => setShowAddModal(true),
+          () => {
+            Taro.scanCode({
+              onlyFromCamera: false,
+              scanType: ['qrCode'],
+              success: () => {
+                Taro.showToast({ title: '扫码成功，已加入', icon: 'success' });
+              },
+              fail: () => {
+                Taro.showToast({ title: '扫码功能暂不可用', icon: 'none' });
+              },
+            });
+          },
+          () => setShowShareModal(true),
+        ];
+        actions[res.tapIndex]?.();
+      },
+    });
   }, []);
 
+  const handleAddConfirm = useCallback(() => {
+    if (!newNickname.trim()) {
+      Taro.showToast({ title: '请输入昵称', icon: 'none' });
+      return;
+    }
+    if (!currentTripId) return;
+    const randomId = `user_${Date.now()}`;
+    addMember(currentTripId, {
+      id: randomId,
+      name: newNickname.trim(),
+      avatar: `https://picsum.photos/seed/${randomId}/200/200`,
+    });
+    setNewNickname('');
+    setShowAddModal(false);
+    Taro.showToast({ title: '添加成功', icon: 'success' });
+  }, [newNickname, currentTripId, addMember]);
+
   const handleInvite = useCallback(() => {
-    Taro.showToast({ title: '生成邀请码...', icon: 'loading' });
-    setTimeout(() => {
-      Taro.showModal({
-        title: '邀请同伴',
-        content: '小程序码已生成\n将图片分享到微信群即可邀请',
-        showCancel: false,
-      });
-    }, 1000);
+    setShowInviteModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setShowInviteModal(false);
+  }, []);
+
+  const handleModalMaskClick = useCallback((e) => {
+    e.stopPropagation();
+    setShowInviteModal(false);
+  }, []);
+
+  const handleModalContentClick = useCallback((e) => {
+    e.stopPropagation();
   }, []);
 
   const getMemberStat = useCallback(
@@ -115,6 +165,111 @@ const MembersPage: React.FC = () => {
           <Text className={styles.addBtnText}>生成邀请码</Text>
         </View>
       </ScrollView>
+
+      {showInviteModal && (
+        <View
+          className={styles.modalMask}
+          onClick={() => setShowInviteModal(false)}
+        >
+          <View
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <View
+              className={styles.modalClose}
+              onClick={() => setShowInviteModal(false)}
+            >
+              <Text className={styles.modalCloseIcon}>✕</Text>
+            </View>
+            <Text className={styles.modalTitle}>邀请同伴</Text>
+            <Text className={styles.modalTripName}>
+              {currentTrip?.name || '行程'}
+            </Text>
+            <Image
+              className={styles.qrcodeImg}
+              src="https://picsum.photos/400/400"
+              mode="aspectFit"
+            />
+            <Text className={styles.modalTip}>扫码加入行程</Text>
+          </View>
+        </View>
+      )}
+
+      {showAddModal && (
+        <View
+          className={styles.modalMask}
+          onClick={() => setShowAddModal(false)}
+        >
+          <View
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Text className={styles.modalTitle}>添加同伴</Text>
+            <View className={styles.addInputWrapper}>
+              <Input
+                className={styles.addInput}
+                placeholder="请输入同伴昵称"
+                placeholderClass={styles.inputPlaceholder}
+                value={newNickname}
+                onInput={(e) => setNewNickname(e.detail.value)}
+                focus
+              />
+            </View>
+            <View className={styles.modalActions}>
+              <View
+                className={`${styles.modalBtn} ${styles.modalBtnCancel}`}
+                onClick={() => setShowAddModal(false)}
+              >
+                <Text className={styles.modalBtnCancelText}>取消</Text>
+              </View>
+              <View
+                className={`${styles.modalBtn} ${styles.modalBtnConfirm}`}
+                onClick={handleAddConfirm}
+              >
+                <Text className={styles.modalBtnConfirmText}>确定</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {showShareModal && (
+        <View
+          className={styles.modalMask}
+          onClick={() => setShowShareModal(false)}
+        >
+          <View
+            className={styles.shareSheet}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Text className={styles.shareTitle}>分享到</Text>
+            <View className={styles.shareGrid}>
+              <View className={styles.shareItem}>
+                <View className={styles.shareIcon}>💬</View>
+                <Text className={styles.shareText}>微信群</Text>
+              </View>
+              <View className={styles.shareItem}>
+                <View className={styles.shareIcon}>👤</View>
+                <Text className={styles.shareText}>微信好友</Text>
+              </View>
+              <View className={styles.shareItem}>
+                <View className={styles.shareIcon}>📱</View>
+                <Text className={styles.shareText}>朋友圈</Text>
+              </View>
+              <View className={styles.shareItem}>
+                <View className={styles.shareIcon}>🔗</View>
+                <Text className={styles.shareText}>复制链接</Text>
+              </View>
+            </View>
+            <View
+              className={styles.shareCancel}
+              onClick={() => setShowShareModal(false)}
+            >
+              <Text className={styles.shareCancelText}>取消</Text>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

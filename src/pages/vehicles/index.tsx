@@ -34,15 +34,21 @@ const VehiclesPage: React.FC = () => {
   );
 
   const handleAddVehicle = useCallback(() => {
-    Taro.showToast({ title: '添加车辆功能开发中', icon: 'none' });
+    Taro.navigateTo({
+      url: '/pages/vehicle-edit/index',
+    });
   }, []);
 
   const handleAddFuel = useCallback(() => {
-    Taro.showToast({ title: '油费补贴录入功能开发中', icon: 'none' });
+    Taro.navigateTo({
+      url: '/pages/fuel-subsidy/index',
+    });
   }, []);
 
-  const handleVehicleClick = useCallback(() => {
-    Taro.showToast({ title: '车辆详情功能开发中', icon: 'none' });
+  const handleVehicleClick = useCallback((vehicleId: string) => {
+    Taro.navigateTo({
+      url: `/pages/vehicle-detail/index?id=${vehicleId}`,
+    });
   }, []);
 
   const getOwnerById = useCallback(
@@ -69,7 +75,7 @@ const VehiclesPage: React.FC = () => {
                 <View
                   key={vehicle.id}
                   className={styles.vehicleCard}
-                  onClick={handleVehicleClick}
+                  onClick={() => handleVehicleClick(vehicle.id)}
                 >
                   <View className={styles.vehicleHeader}>
                     <View className={styles.vehicleModel}>

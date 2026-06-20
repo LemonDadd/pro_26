@@ -70,8 +70,9 @@ const ExpenseDetailPage: React.FC = () => {
   }, [expenseId, currentTripId, deleteExpense]);
 
   const handleEdit = useCallback(() => {
-    Taro.showToast({ title: '编辑功能开发中', icon: 'none' });
-  }, []);
+    if (!expenseId) return;
+    Taro.navigateTo({ url: `/pages/add-expense/index?expenseId=${expenseId}` });
+  }, [expenseId]);
 
   if (!expense) {
     return (

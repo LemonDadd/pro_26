@@ -14,17 +14,19 @@ interface TripStore {
   getCurrentTrip: () => Trip | undefined;
   addTrip: (trip: Omit<Trip, 'id' | 'createdAt'>) => void;
   updateTrip: (tripId: string, updates: Partial<Trip>) => void;
+  updateCurrentUser: (updates: Partial<User>) => void;
 
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => void;
-  updateExpense: (expenseId: string, updates: Partial<Expense>) => void;
-  deleteExpense: (expenseId: string) => void;
+  updateExpense: (tripId: string, expenseId: string, updates: Partial<Expense>) => void;
+  deleteExpense: (tripId: string, expenseId: string) => void;
   getExpenseById: (expenseId: string) => Expense | undefined;
 
   addMember: (tripId: string, member: User) => void;
   removeMember: (tripId: string, userId: string) => void;
 
-  addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
-  removeVehicle: (vehicleId: string) => void;
+  addVehicle: (tripId: string, vehicle: Omit<Vehicle, 'id' | 'tripId'>) => void;
+  updateVehicle: (tripId: string, vehicleId: string, updates: Partial<Vehicle>) => void;
+  deleteVehicle: (tripId: string, vehicleId: string) => void;
 
   markSettled: (fromUserId: string, toUserId: string, amount: number) => void;
   isSettled: (fromUserId: string, toUserId: string, amount: number) => boolean;
@@ -92,24 +94,46 @@ export const useTripStore = create<TripStore>((set, get) => ({
     });
   },
 
-  updateExpense: (expenseId, updates) => {
+  updateExpense: (tripId, expenseId, updates) => {
     set((state) => ({
-      trips: state.trips.map((t) => ({
-        ...t,
-        expenses: t.expenses?.map((e) =>
-          e.id === expenseId ? { ...e, ...updates } : e
-        ),
-      })),
+      trips: state.trips.map((t) =>
+        t.id === tripId
+          ? {
+              ...t,
+              expenses: t.expenses?.map((e) =>
+                e.id === expenseId ? { ...e, ...updates } : e
+              ),
+            }
+          : t
+      ),
     }));
+
+    get().addActivity({
+      tripId,
+      type: 'expense',
+      userId: get().currentUser.id,
+      content: `修改了费用：${updates.description || ''}`,
+      amount: updates.amount,
+    });
   },
 
-  deleteExpense: (expenseId) => {
+  deleteExpense: (tripId, expenseId) => {
+    const expense = get().getExpenseById(expenseId);
     set((state) => ({
-      trips: state.trips.map((t) => ({
-        ...t,
-        expenses: t.expenses?.filter((e) => e.id !== expenseId),
-      })),
+      trips: state.trips.map((t) =>
+        t.id === tripId
+          ? { ...t, expenses: t.expenses?.filter((e) => e.id !== expenseId) }
+          : t
+      ),
     }));
+
+    get().addActivity({
+      tripId,
+      type: 'expense',
+      userId: get().currentUser.id,
+      content: `删除了费用：${expense?.description || ''}`,
+      amount: -expense?.amount,
+    });
   },
 
   getExpenseById: (expenseId) => {
@@ -148,26 +172,43 @@ export const useTripStore = create<TripStore>((set, get) => ({
     }));
   },
 
-  addVehicle: (vehicle) => {
+  addVehicle: (tripId, vehicle) => {
     const newVehicle: Vehicle = {
       ...vehicle,
       id: generateId(),
+      tripId,
     };
     set((state) => ({
       trips: state.trips.map((t) =>
-        t.id === vehicle.tripId
+        t.id === tripId
           ? { ...t, vehicles: [...(t.vehicles || []), newVehicle] }
           : t
       ),
     }));
   },
 
-  removeVehicle: (vehicleId) => {
+  updateVehicle: (tripId, vehicleId, updates) => {
     set((state) => ({
-      trips: state.trips.map((t) => ({
-        ...t,
-        vehicles: t.vehicles?.filter((v) => v.id !== vehicleId),
-      })),
+      trips: state.trips.map((t) =>
+        t.id === tripId
+          ? {
+              ...t,
+              vehicles: t.vehicles?.map((v) =>
+                v.id === vehicleId ? { ...v, ...updates } : v
+              ),
+            }
+          : t
+      ),
+    }));
+  },
+
+  deleteVehicle: (tripId, vehicleId) => {
+    set((state) => ({
+      trips: state.trips.map((t) =>
+        t.id === tripId
+          ? { ...t, vehicles: t.vehicles?.filter((v) => v.id !== vehicleId) }
+          : t
+      ),
     }));
   },
 
@@ -212,5 +253,11 @@ export const useTripStore = create<TripStore>((set, get) => ({
 
   getActivitiesByTrip: (tripId) => {
     return get().activities.filter((a) => a.tripId === tripId);
+  },
+
+  updateCurrentUser: (updates) => {
+    set((state) => ({
+      currentUser: { ...state.currentUser, ...updates },
+    }));
   },
 }));

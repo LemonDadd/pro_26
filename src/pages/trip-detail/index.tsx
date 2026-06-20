@@ -46,8 +46,8 @@ const TripDetailPage: React.FC = () => {
   }, []);
 
   const handleEditTrip = useCallback(() => {
-    Taro.showToast({ title: '编辑行程功能开发中', icon: 'none' });
-  }, []);
+    Taro.navigateTo({ url: `/pages/create-trip/index?tripId=${tripId}` });
+  }, [tripId]);
 
   const handleAddExpense = useCallback(() => {
     if (tripId) {

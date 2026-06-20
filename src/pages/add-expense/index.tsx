@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,27 @@ import {
   ScrollView,
   Image,
 } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useRouter } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import { ExpenseCategory, SplitType } from '@/types';
 import {
   categoryLabels,
   categoryEmojis,
-  generateId,
 } from '@/utils/format';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const AddExpensePage: React.FC = () => {
-  const { trips, currentTripId, currentUser, addExpense, setCurrentTrip } = useTripStore();
+  const router = useRouter();
+  const { trips, currentTripId, currentUser, addExpense, updateExpense, getExpenseById, setCurrentTrip } = useTripStore();
+
+  const expenseId = router.params.expenseId;
+  const isEditMode = !!expenseId;
+  const expense = useMemo(
+    () => (expenseId ? getExpenseById(expenseId) : undefined),
+    [expenseId, getExpenseById]
+  );
 
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -41,11 +48,32 @@ const AddExpensePage: React.FC = () => {
 
   const members = currentTrip?.members || [];
 
-  React.useEffect(() => {
-    if (members.length > 0 && selectedMembers.length === 0) {
+  useEffect(() => {
+    if (isEditMode && expense) {
+      const currencyCode = expense.currency || 'CNY';
+      const rate = expense.exchangeRate || 1;
+      const originalAmount = currencyCode === 'CNY'
+        ? expense.amount
+        : expense.amount / rate;
+
+      setAmount(originalAmount.toString());
+      setDescription(expense.description);
+      setCategory(expense.category);
+      setPayerId(expense.payerId);
+      setSplitType(expense.splitType);
+      setSelectedMembers(expense.participants);
+      setNote(expense.note || '');
+      setReceiptImage(expense.receiptImage || '');
+      setCurrency(currencyCode);
+      setExchangeRate(rate.toString());
+    }
+  }, [isEditMode, expense]);
+
+  useEffect(() => {
+    if (!isEditMode && members.length > 0 && selectedMembers.length === 0) {
       setSelectedMembers(members.map((m) => m.id));
     }
-  }, [members, selectedMembers.length]);
+  }, [members, selectedMembers.length, isEditMode]);
 
   const categories: ExpenseCategory[] = [
     'food',
@@ -150,8 +178,7 @@ const AddExpensePage: React.FC = () => {
       return;
     }
 
-    addExpense({
-      tripId: currentTripId,
+    const expenseData = {
       amount: Number(cnyAmount.toFixed(2)),
       category,
       description: description.trim(),
@@ -162,10 +189,20 @@ const AddExpensePage: React.FC = () => {
       receiptImage: receiptImage || undefined,
       currency,
       exchangeRate: currency === 'CNY' ? 1 : rateNum,
-      createdBy: currentUser.id,
-    });
+    };
 
-    Taro.showToast({ title: '记账成功', icon: 'success' });
+    if (isEditMode && expenseId) {
+      updateExpense(currentTripId, expenseId, expenseData);
+      Taro.showToast({ title: '保存成功', icon: 'success' });
+    } else {
+      addExpense({
+        tripId: currentTripId,
+        ...expenseData,
+        createdBy: currentUser.id,
+      });
+      Taro.showToast({ title: '记账成功', icon: 'success' });
+    }
+
     setTimeout(() => {
       Taro.navigateBack();
     }, 1000);
@@ -182,6 +219,9 @@ const AddExpensePage: React.FC = () => {
     splitType,
     note,
     receiptImage,
+    isEditMode,
+    expenseId,
+    updateExpense,
     addExpense,
     currentUser.id,
   ]);
@@ -202,7 +242,7 @@ const AddExpensePage: React.FC = () => {
 
   return (
     <View className={styles.page}>
-      <NavBar title="记一笔" showBack />
+      <NavBar title={isEditMode ? '编辑费用' : '记一笔'} showBack />
       <ScrollView scrollY>
         <View className={styles.section}>
           <View className={styles.inputRow}>
@@ -215,7 +255,7 @@ const AddExpensePage: React.FC = () => {
                 placeholderClass={styles.inputPlaceholder}
                 value={amount}
                 onInput={(e) => setAmount(e.detail.value)}
-                focus
+                focus={!isEditMode}
               />
             </View>
           </View>
@@ -428,7 +468,7 @@ const AddExpensePage: React.FC = () => {
 
       <View className={styles.bottomBar}>
         <Button className={styles.submitBtn} onClick={handleSubmit}>
-          <Text className={styles.submitBtnText}>保存</Text>
+          <Text className={styles.submitBtnText}>{isEditMode ? '保存修改' : '保存'}</Text>
         </Button>
       </View>
     </View>
