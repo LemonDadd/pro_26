@@ -65,7 +65,7 @@ const TemplatesPage: React.FC = () => {
                   </View>
                 </View>
                 <View className={styles.tags}>
-                  {template.tags.map((tag, index) => (
+                  {(template.tags || []).map((tag, index) => (
                     <Text key={index} className={styles.tag}>
                       {tag}
                     </Text>

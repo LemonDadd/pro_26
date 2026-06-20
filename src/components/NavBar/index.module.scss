@@ -1,0 +1,51 @@
+@use '@/styles/variables.scss' as *;
+
+.placeholder {
+  width: 100%;
+  height: calc(88rpx + env(safe-area-inset-top));
+}
+
+.navBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(88rpx + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  background: #ffffff;
+  box-shadow: 0 1rpx 0 rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  z-index: 999;
+}
+
+.backBtn {
+  @include button-reset;
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.backIcon {
+  font-size: 40rpx;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  padding: 0 88rpx 0 0;
+  line-height: 88rpx;
+  @include text-ellipsis;
+}
+
+.titleWithBack {
+  padding: 0 88rpx;
+}

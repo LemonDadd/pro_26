@@ -103,6 +103,7 @@ export interface TripTemplate {
   estimatedBudget: number;
   categories: ExpenseCategory[];
   sampleDays: TripDayPlan[];
+  tags: string[];
 }
 
 export interface Activity {

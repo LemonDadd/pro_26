@@ -9,6 +9,7 @@ export const tripTemplates: TripTemplate[] = [
     estimatedDays: 7,
     estimatedBudget: 3500,
     categories: ['hotel', 'food', 'fuel', 'toll', 'ticket', 'parking', 'other'],
+    tags: ['自驾', '自然风光', '摄影'],
     sampleDays: [
       { day: 1, date: '', destination: '成都', description: '集合出发' },
       { day: 2, date: '', destination: '康定', description: '翻越折多山' },
@@ -27,6 +28,7 @@ export const tripTemplates: TripTemplate[] = [
     estimatedDays: 15,
     estimatedBudget: 8000,
     categories: ['hotel', 'food', 'fuel', 'toll', 'ticket', 'parking', 'transport', 'other'],
+    tags: ['自驾', '长途', '自然风光', '人文'],
     sampleDays: [
       { day: 1, date: '', destination: '乌鲁木齐', description: '集合出发' },
       { day: 2, date: '', destination: '可可托海', description: '地质公园' },
@@ -53,6 +55,7 @@ export const tripTemplates: TripTemplate[] = [
     estimatedDays: 5,
     estimatedBudget: 4000,
     categories: ['hotel', 'food', 'transport', 'ticket', 'other'],
+    tags: ['度假', '海滩', '休闲'],
     sampleDays: [
       { day: 1, date: '', destination: '抵达', description: '入住酒店' },
       { day: 2, date: '', destination: '海边', description: '沙滩日光浴' },
@@ -69,6 +72,7 @@ export const tripTemplates: TripTemplate[] = [
     estimatedDays: 3,
     estimatedBudget: 1500,
     categories: ['hotel', 'food', 'transport', 'ticket', 'other'],
+    tags: ['美食', '城市', '短途'],
     sampleDays: [
       { day: 1, date: '', destination: '抵达', description: '小吃街' },
       { day: 2, date: '', destination: '市区', description: '网红店打卡' },
