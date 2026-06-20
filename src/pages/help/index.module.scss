@@ -1,0 +1,225 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.scroll {
+  height: 100vh;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  margin: $spacing-lg $page-padding;
+  padding: $spacing-md $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-round;
+  box-shadow: $shadow-card;
+}
+
+.searchIcon {
+  font-size: 28rpx;
+  margin-right: $spacing-sm;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.searchPlaceholder {
+  color: $color-text-tertiary;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.faqList {
+  margin: 0 $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.faqItem {
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.faqQuestion {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+}
+
+.faqQuestionText {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.faqArrow {
+  color: $color-text-tertiary;
+  font-size: $font-size-lg;
+  transition: transform $transition-fast;
+  transform: rotate(90deg);
+}
+
+.faqArrowUp {
+  transform: rotate(-90deg);
+}
+
+.faqAnswer {
+  padding: 0 $spacing-lg $spacing-md;
+}
+
+.faqAnswerText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+}
+
+.faqEmpty {
+  padding: $spacing-xl 0;
+  text-align: center;
+}
+
+.faqEmptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.feedbackSection {
+  margin-top: $spacing-xl;
+  padding: 0 $page-padding;
+}
+
+.feedbackBtn {
+  background: $color-primary;
+  border-radius: $radius-button;
+  padding: $spacing-md 0;
+  text-align: center;
+  box-shadow: $shadow-card;
+
+  &:active {
+    background: $color-primary-dark;
+  }
+}
+
+.feedbackText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalCard {
+  width: 600rpx;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl $spacing-lg $spacing-lg;
+  box-shadow: $shadow-popup;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.modalTextarea {
+  width: 100%;
+  min-height: 200rpx;
+  max-height: 400rpx;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: $line-height-loose;
+}
+
+.modalTextareaPlaceholder {
+  color: $color-text-tertiary;
+}
+
+.modalCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: right;
+  margin-top: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.modalButtons {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.modalBtn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.modalBtnCancel {
+  background: $color-bg-page;
+}
+
+.modalBtnCancelText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.modalBtnConfirm {
+  background: $color-primary;
+}
+
+.modalBtnConfirmText {
+  font-size: $font-size-md;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}

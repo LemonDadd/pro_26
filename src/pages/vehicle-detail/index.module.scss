@@ -1,0 +1,189 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-secondary 0%, #6ee7de 100%);
+  padding: $spacing-xl $page-padding;
+  text-align: center;
+  color: $color-text-white;
+}
+
+.vehicleIconWrapper {
+  width: 120rpx;
+  height: 120rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto $spacing-md;
+}
+
+.vehicleIcon {
+  font-size: 64rpx;
+}
+
+.vehicleModel {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.plateBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 6rpx 20rpx;
+  border-radius: $radius-sm;
+}
+
+.plateText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.section {
+  background: $color-bg-card;
+  margin-top: $spacing-md;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.infoLabel {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.infoValue {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.ownerInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.ownerName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.statsCard {
+  display: flex;
+  align-items: center;
+  padding: $spacing-xl $spacing-lg;
+}
+
+.statsItem {
+  flex: 1;
+  text-align: center;
+}
+
+.statsValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.statsLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.statsDivider {
+  width: 1rpx;
+  height: 80rpx;
+  background: $color-divider;
+}
+
+.sectionHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.expenseList {
+  padding: 0 $spacing-lg;
+}
+
+.emptyState {
+  padding: $spacing-xxl $spacing-lg;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 72rpx;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.emptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.deleteBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+}
+
+.deleteBtnText {
+  color: $color-error;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.editBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.editBtnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}

@@ -1,0 +1,259 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.section {
+  background: $color-bg-card;
+  margin-top: $spacing-md;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.inputLabel {
+  width: 180rpx;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  flex-shrink: 0;
+}
+
+.inputContent {
+  flex: 1;
+}
+
+.textInput {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  text-align: right;
+  width: 100%;
+}
+
+.inputPlaceholder {
+  font-size: $font-size-md;
+  color: $color-text-disabled;
+  text-align: right;
+}
+
+.vehicleSelector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+}
+
+.vehicleName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.plateText {
+  font-size: $font-size-xs;
+  color: $color-secondary;
+  background: rgba(78, 205, 196, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+}
+
+.arrowIcon {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+}
+
+.placeholderText {
+  font-size: $font-size-md;
+  color: $color-text-disabled;
+}
+
+.dateText {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  text-align: right;
+  display: block;
+  width: 100%;
+}
+
+.inputWithUnit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-xs;
+}
+
+.unitText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.totalAmountWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4rpx;
+}
+
+.currencySymbol {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.totalAmountInput {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  text-align: right;
+  width: auto;
+  min-width: 200rpx;
+}
+
+.payerInfo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+}
+
+.payerName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.sectionHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.noteInput {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  padding: $spacing-md 0;
+  line-height: 1.5;
+}
+
+.pickerMask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.pickerContent {
+  width: 100%;
+  background: $color-bg-card;
+  border-radius: $radius-xl $radius-xl 0 0;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pickerHeader {
+  padding: $spacing-lg;
+  text-align: center;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.pickerTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.pickerList {
+  flex: 1;
+  padding: 0 $spacing-lg;
+}
+
+.pickerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.pickerItemInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.vehicleIcon {
+  font-size: 40rpx;
+}
+
+.pickerItemTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  display: block;
+}
+
+.pickerItemSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.checkIcon {
+  font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-secondary 0%, #6ee7de 100%);
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.submitBtnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
