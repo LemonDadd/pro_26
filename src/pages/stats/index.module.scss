@@ -1,0 +1,264 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary-dark 0%, $color-primary 100%);
+  padding: $spacing-xl $page-padding;
+  padding-bottom: 100rpx;
+}
+
+.tripSelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.tripName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.tripArrow {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-size-md;
+  margin-left: $spacing-sm;
+}
+
+.overviewCard {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  backdrop-filter: blur(10px);
+}
+
+.overviewTotal {
+  text-align: center;
+  margin-bottom: $spacing-lg;
+}
+
+.totalLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.totalAmount {
+  font-size: 56rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.overviewGrid {
+  display: flex;
+  justify-content: space-around;
+}
+
+.overviewItem {
+  text-align: center;
+  flex: 1;
+}
+
+.overviewValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.overviewLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -48rpx;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.personalCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.personalInfo {
+  flex: 1;
+}
+
+.personalName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.personalStats {
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.personalStat {
+  display: flex;
+  flex-direction: column;
+}
+
+.personalStatValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.personalStatLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 2rpx;
+}
+
+.balanceTag {
+  padding: 12rpx 20rpx;
+  border-radius: $radius-round;
+}
+
+.positive {
+  background: rgba(0, 180, 42, 0.1);
+
+  .balanceText {
+    color: $color-success;
+  }
+}
+
+.negative {
+  background: rgba(245, 63, 63, 0.1);
+
+  .balanceText {
+    color: $color-error;
+  }
+}
+
+.zero {
+  background: rgba(134, 144, 156, 0.1);
+
+  .balanceText {
+    color: $color-text-tertiary;
+  }
+}
+
+.balanceText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.pieChartSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pieChart {
+  width: 300rpx;
+  height: 300rpx;
+  margin-bottom: $spacing-lg;
+}
+
+.legendList {
+  width: 100%;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.legendLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.legendColor {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: $radius-xs;
+}
+
+.legendName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.legendRight {
+  text-align: right;
+}
+
+.legendAmount {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+}
+
+.legendPercent {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.shareButton {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  margin-top: $spacing-lg;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.shareBtnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}

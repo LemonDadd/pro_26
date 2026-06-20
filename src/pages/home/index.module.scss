@@ -1,0 +1,239 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(255, 107, 53, 0.08) 0%, $color-bg-page 30%);
+  padding-bottom: 120rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-xl;
+}
+
+.welcomeSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.welcomeText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.userName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.scanBtn {
+  @include button-reset;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: $shadow-card;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+}
+
+.scanIcon {
+  font-size: 32rpx;
+}
+
+.actionButtons {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: 88rpx;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 53, 0.3);
+}
+
+.secondaryBtn {
+  background: $color-bg-card;
+  box-shadow: $shadow-card;
+}
+
+.btnIcon {
+  font-size: $font-size-lg;
+}
+
+.primaryBtn .btnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.secondaryBtn .btnText {
+  color: $color-text-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+.statsCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.statsTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.statsGrid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statItem {
+  flex: 1;
+  text-align: center;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.section {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.moreBtn {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.tripList {
+  display: flex;
+  flex-direction: column;
+}
+
+.templatesSection {
+  padding: 0 $page-padding;
+}
+
+.templateList {
+  display: flex;
+  gap: $spacing-md;
+  @include scroll-x-container;
+  padding-bottom: $spacing-sm;
+}
+
+.templateCard {
+  @include scroll-x-item(280rpx);
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+}
+
+.templateCover {
+  width: 100%;
+  height: 180rpx;
+  display: block;
+}
+
+.templateInfo {
+  padding: $spacing-md;
+}
+
+.templateName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.templateDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.templateMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.templateDays {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.templateBudget {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}

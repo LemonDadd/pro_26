@@ -1,0 +1,159 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding;
+  color: $color-text-white;
+  text-align: center;
+}
+
+.amountText {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-sm;
+}
+
+.descText {
+  font-size: $font-size-md;
+  opacity: 0.9;
+}
+
+.metaText {
+  font-size: $font-size-xs;
+  opacity: 0.7;
+  margin-top: $spacing-sm;
+}
+
+.section {
+  background: $color-bg-card;
+  margin-top: $spacing-md;
+}
+
+.sectionHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.infoValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.payerInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.participantList {
+  padding: 0 $spacing-lg;
+}
+
+.participantItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.participantInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.participantName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.shareAmount {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.receiptImage {
+  width: 100%;
+  height: 400rpx;
+  border-radius: $radius-md;
+}
+
+.noteText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  padding: $spacing-md $spacing-lg;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.deleteBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+}
+
+.deleteBtnText {
+  color: $color-error;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.editBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.editBtnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}

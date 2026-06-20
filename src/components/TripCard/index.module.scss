@@ -1,0 +1,167 @@
+@use '@/styles/variables.scss' as *;
+
+.tripCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+}
+
+.tripInfo {
+  flex: 1;
+}
+
+.tripTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  @include text-ellipsis;
+}
+
+.tripMeta {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xs;
+}
+
+.metaItem {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.statusBadge {
+  padding: 8rpx 16rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+}
+
+.active {
+  background: rgba(0, 180, 42, 0.1);
+
+  .statusText {
+    color: $color-success;
+  }
+}
+
+.completed {
+  background: rgba(134, 144, 156, 0.1);
+
+  .statusText {
+    color: $color-text-tertiary;
+  }
+}
+
+.statusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.cardBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-top: 1rpx solid $color-divider;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.expenseSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.expenseLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.expenseAmount {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.membersSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.memberAvatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatarWrap {
+  border: 2rpx solid $color-bg-card;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.moreMembers {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -16rpx;
+  border: 2rpx solid $color-bg-card;
+}
+
+.moreText {
+  font-size: 20rpx;
+  color: $color-text-secondary;
+}
+
+.memberCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-md;
+}
+
+.dateText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.leaderInfo {
+  display: flex;
+  align-items: center;
+}
+
+.leaderLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.leaderName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}

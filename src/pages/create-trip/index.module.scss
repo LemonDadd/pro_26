@@ -1,0 +1,148 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.section {
+  background: $color-bg-card;
+  margin-top: $spacing-md;
+}
+
+.sectionHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.inputLabel {
+  width: 160rpx;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  flex-shrink: 0;
+}
+
+.inputContent {
+  flex: 1;
+}
+
+.textInput {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  text-align: right;
+  width: 100%;
+}
+
+.inputPlaceholder {
+  font-size: $font-size-md;
+  color: $color-text-disabled;
+  text-align: right;
+}
+
+.templateList {
+  padding: $spacing-md $spacing-lg;
+}
+
+.templateItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.selected {
+    background: rgba(255, 107, 53, 0.05);
+  }
+}
+
+.templateCover {
+  width: 120rpx;
+  height: 80rpx;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.templateInfo {
+  flex: 1;
+}
+
+.templateName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.templateDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.checkmark {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.checkmarkText {
+  color: $color-text-white;
+  font-size: $font-size-sm;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.submitBtnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}

@@ -1,0 +1,46 @@
+@use '@/styles/variables.scss' as *;
+
+.avatar {
+  border-radius: $radius-round;
+  overflow: hidden;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.small {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.medium {
+  width: 72rpx;
+  height: 72rpx;
+}
+
+.large {
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.avatarText {
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-md;
+}
+
+.small .avatarText {
+  font-size: $font-size-sm;
+}
+
+.large .avatarText {
+  font-size: $font-size-lg;
+}

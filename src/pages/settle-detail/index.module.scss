@@ -1,0 +1,184 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding;
+  color: $color-text-white;
+  text-align: center;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.totalSection {
+  background: $color-bg-card;
+  margin: $spacing-md;
+  border-radius: $radius-card;
+  padding: $spacing-lg;
+  display: flex;
+  justify-content: space-around;
+}
+
+.totalItem {
+  text-align: center;
+}
+
+.totalLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.totalValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.section {
+  background: $color-bg-card;
+  margin: $spacing-md;
+  border-radius: $radius-card;
+  overflow: hidden;
+}
+
+.sectionHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.settleList {
+  padding: $spacing-sm $spacing-lg;
+}
+
+.settleItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+  gap: $spacing-sm;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.settleFrom {
+  flex: 1;
+  text-align: right;
+}
+
+.settleTo {
+  flex: 1;
+  text-align: left;
+}
+
+.userName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  display: block;
+}
+
+.userSub {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.arrow {
+  font-size: $font-size-sm;
+  color: $color-text-disabled;
+  flex-shrink: 0;
+}
+
+.amountBox {
+  text-align: center;
+  flex-shrink: 0;
+  width: 160rpx;
+}
+
+.amountText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.statusTag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  margin-top: 4rpx;
+
+  &.settled {
+    background: rgba(0, 180, 42, 0.1);
+    color: #00b42a;
+  }
+
+  &.pending {
+    background: rgba(255, 107, 53, 0.1);
+    color: $color-primary;
+  }
+}
+
+.actionBtn {
+  @include button-reset;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background: $color-primary;
+  flex-shrink: 0;
+}
+
+.actionBtnText {
+  color: $color-text-white;
+  font-size: $font-size-xs;
+}
+
+.shareSection {
+  background: $color-bg-card;
+  margin: $spacing-md;
+  border-radius: $radius-card;
+  padding: $spacing-lg;
+  display: flex;
+  gap: $spacing-md;
+}
+
+.shareBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+
+    .shareBtnText {
+      color: $color-text-white;
+    }
+  }
+}
+
+.shareBtnText {
+  color: $color-text-primary;
+  font-size: $font-size-sm;
+}

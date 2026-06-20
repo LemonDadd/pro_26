@@ -1,0 +1,122 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-accent 0%, #ff9800 100%);
+  padding: $spacing-xl $page-padding;
+  color: $color-text-white;
+}
+
+.headerTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.headerSubtitle {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.templateList {
+  padding: $spacing-md;
+}
+
+.templateCard {
+  background: $color-bg-card;
+  border-radius: $radius-card;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-sm;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.templateCover {
+  width: 100%;
+  height: 280rpx;
+  display: block;
+}
+
+.templateContent {
+  padding: $spacing-md $spacing-lg $spacing-lg;
+}
+
+.templateName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.templateDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  margin-bottom: $spacing-sm;
+}
+
+.templateMeta {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.metaIcon {
+  font-size: $font-size-sm;
+}
+
+.metaText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+}
+
+.tag {
+  padding: 4rpx 16rpx;
+  background: rgba(255, 107, 53, 0.1);
+  color: $color-primary;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+}
+
+.emptyState {
+  padding: $spacing-xxl $spacing-lg;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 96rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

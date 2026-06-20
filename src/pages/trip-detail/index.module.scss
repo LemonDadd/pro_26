@@ -1,0 +1,233 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 140rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding 80rpx;
+}
+
+.tripTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  display: block;
+  margin-bottom: $spacing-sm;
+}
+
+.tripSubtitle {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.infoCard {
+  margin: 0 $page-padding;
+  margin-top: -48rpx;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.infoValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.section {
+  padding: $spacing-lg $page-padding 0;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.memberItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120rpx;
+}
+
+.memberName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: $spacing-xs;
+  @include text-ellipsis;
+  max-width: 120rpx;
+  text-align: center;
+}
+
+.leaderBadge {
+  font-size: 20rpx;
+  color: $color-primary;
+  background: rgba(255, 107, 53, 0.1);
+  padding: 2rpx 8rpx;
+  border-radius: $radius-xs;
+  margin-top: 2rpx;
+}
+
+.dayList {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 0 $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.dayItem {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.dayNumber {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dayInfo {
+  flex: 1;
+}
+
+.dayDestination {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.dayDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.qrCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  text-align: center;
+}
+
+.qrPlaceholder {
+  width: 300rpx;
+  height: 300rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  margin: 0 auto $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qrIcon {
+  font-size: 80rpx;
+}
+
+.qrTip {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.bottomBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.secondaryBtn {
+  background: $color-bg-hover;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.secondaryBtn .btnText {
+  color: $color-text-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+.primaryBtn .btnText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
