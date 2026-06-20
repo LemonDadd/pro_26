@@ -3,7 +3,7 @@
 .page {
   min-height: 100vh;
   background: $color-bg-page;
-  padding-bottom: 160rpx;
+  padding-bottom: calc(220rpx + 100rpx + env(safe-area-inset-bottom));
 }
 
 .header {
@@ -132,9 +132,9 @@
   @include button-reset;
   position: fixed;
   right: $page-padding;
-  bottom: 140rpx;
-  width: 112rpx;
-  height: 112rpx;
+  bottom: calc(100rpx + env(safe-area-inset-bottom) + 40rpx);
+  width: 104rpx;
+  height: 104rpx;
   border-radius: $radius-round;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.4);

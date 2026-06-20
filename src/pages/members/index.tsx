@@ -7,6 +7,7 @@ import {
 import Taro from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import { formatMoney } from '@/utils/format';
 import styles from './index.module.scss';
 
@@ -56,6 +57,7 @@ const MembersPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="同伴管理" showBack />
       <View className={styles.header}>
         <Text className={styles.headerTitle}>同伴管理</Text>
         <Text className={styles.headerSubtitle}>

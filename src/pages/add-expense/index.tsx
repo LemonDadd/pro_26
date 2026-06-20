@@ -17,6 +17,7 @@ import {
   generateId,
 } from '@/utils/format';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const AddExpensePage: React.FC = () => {
@@ -201,6 +202,7 @@ const AddExpensePage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="记一笔" showBack />
       <ScrollView scrollY>
         <View className={styles.section}>
           <View className={styles.inputRow}>

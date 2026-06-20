@@ -9,6 +9,7 @@ import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import ExpenseItem from '@/components/ExpenseItem';
 import EmptyState from '@/components/EmptyState';
+import NavBar from '@/components/NavBar';
 import {
   getTotalExpense,
   getAveragePerPerson,
@@ -71,6 +72,7 @@ const ExpensePage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="记账" showBack={false} />
       <View className={styles.header}>
         <View className={styles.tripSelector}>
           <Text className={styles.tripName}>

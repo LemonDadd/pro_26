@@ -10,6 +10,7 @@ import Taro from '@tarojs/taro';
 import { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import {
   getTotalExpense,
   getAveragePerPerson,
@@ -141,6 +142,7 @@ const StatsPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="统计分析" showBack={false} />
       <View className={styles.header}>
         <View className={styles.tripSelector}>
           <Text className={styles.tripName}>

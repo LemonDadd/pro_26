@@ -10,6 +10,7 @@ import {
 import Taro, { useRouter } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import { tripTemplates } from '@/data/templates';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const CreateTripPage: React.FC = () => {
@@ -104,6 +105,7 @@ const CreateTripPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="创建行程" showBack />
       <ScrollView scrollY>
         <View className={styles.section}>
           <View className={styles.inputRow}>

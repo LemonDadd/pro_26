@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import { getTotalExpense } from '@/utils/aaCalculator';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const MinePage: React.FC = () => {
@@ -54,8 +55,10 @@ const MinePage: React.FC = () => {
   ];
 
   return (
-    <ScrollView scrollY className={styles.page}>
-      <View className={styles.header}>
+    <View>
+      <NavBar title="我的" showBack={false} />
+      <ScrollView scrollY className={styles.page}>
+        <View className={styles.header}>
         <View className={styles.userProfile}>
           <Image
             className={styles.userAvatar}
@@ -118,7 +121,8 @@ const MinePage: React.FC = () => {
       <View className={styles.footer}>
         <Text className={styles.footerText}>旅行拼车 AA v1.0.0</Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

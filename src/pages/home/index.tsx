@@ -11,6 +11,7 @@ import { useTripStore } from '@/store/useTripStore';
 import { tripTemplates } from '@/data/templates';
 import TripCard from '@/components/TripCard';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import { getTotalExpense } from '@/utils/aaCalculator';
 import styles from './index.module.scss';
 
@@ -71,8 +72,10 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <ScrollView scrollY className={styles.page}>
-      <View className={styles.header}>
+    <View>
+      <NavBar title="旅行拼车 AA" showBack={false} />
+      <ScrollView scrollY className={styles.page}>
+        <View className={styles.header}>
         <View className={styles.welcomeSection}>
           <View className={styles.userInfo}>
             <Avatar
@@ -184,7 +187,8 @@ const HomePage: React.FC = () => {
           ))}
         </ScrollView>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

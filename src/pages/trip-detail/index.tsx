@@ -4,6 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro';
 import { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import {
   getDaysBetween,
   formatDate,
@@ -58,6 +59,7 @@ const TripDetailPage: React.FC = () => {
   if (!trip) {
     return (
       <View className={styles.page}>
+        <NavBar title="行程详情" showBack />
         <View style={{ padding: 100, textAlign: 'center' }}>
           <Text>行程不存在</Text>
         </View>
@@ -69,6 +71,7 @@ const TripDetailPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="行程详情" showBack />
       <View className={styles.header}>
         <Text className={styles.tripTitle}>{trip.title}</Text>
         <Text className={styles.tripSubtitle}>📍 {trip.destination} · {days}天行程</Text>

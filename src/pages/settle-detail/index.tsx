@@ -15,6 +15,7 @@ import {
 } from '@/utils/aaCalculator';
 import { formatMoney } from '@/utils/format';
 import Avatar from '@/components/Avatar';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const SettleDetailPage: React.FC = () => {
@@ -100,6 +101,7 @@ const SettleDetailPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="结算详情" showBack />
       <View className={styles.header}>
         <Text className={styles.title}>结算方案</Text>
         <Text className={styles.subtitle}>

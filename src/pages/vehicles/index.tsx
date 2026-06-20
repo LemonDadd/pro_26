@@ -9,6 +9,7 @@ import Taro from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import { formatMoney } from '@/utils/format';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const VehiclesPage: React.FC = () => {
@@ -51,6 +52,7 @@ const VehiclesPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="车辆管理" showBack />
       <View className={styles.header}>
         <Text className={styles.headerTitle}>拼车用车</Text>
         <Text className={styles.headerSubtitle}>

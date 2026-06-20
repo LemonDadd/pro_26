@@ -3,7 +3,7 @@
 .page {
   min-height: 100vh;
   background: $color-bg-page;
-  padding-bottom: 120rpx;
+  padding-bottom: calc(120rpx + 100rpx + env(safe-area-inset-bottom));
 }
 
 .header {

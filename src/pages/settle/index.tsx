@@ -6,6 +6,7 @@ import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import SettlementItem from '@/components/SettlementItem';
 import EmptyState from '@/components/EmptyState';
+import NavBar from '@/components/NavBar';
 import {
   calculateUserBalances,
   simplifyDebts,
@@ -82,6 +83,7 @@ const SettlePage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="AA 结算" showBack={false} />
       <View className={styles.header}>
         <Text className={styles.headerTitle}>当前行程</Text>
         <Text className={styles.tripName}>

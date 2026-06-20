@@ -11,6 +11,7 @@ import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import CategoryIcon from '@/components/CategoryIcon';
 import { categoryLabels, formatDate, formatMoney } from '@/utils/format';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const ExpenseDetailPage: React.FC = () => {
@@ -75,6 +76,7 @@ const ExpenseDetailPage: React.FC = () => {
   if (!expense) {
     return (
       <View className={styles.page}>
+        <NavBar title="费用详情" showBack />
         <Text style={{ padding: 100, textAlign: 'center', display: 'block', color: '#86909c' }}>
           费用不存在
         </Text>
@@ -84,6 +86,7 @@ const ExpenseDetailPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="费用详情" showBack />
       <View className={styles.header}>
         <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
           <CategoryIcon category={expense.category} size="medium" />

@@ -7,6 +7,7 @@ import {
 } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { tripTemplates } from '@/data/templates';
+import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const TemplatesPage: React.FC = () => {
@@ -18,6 +19,7 @@ const TemplatesPage: React.FC = () => {
 
   return (
     <View className={styles.page}>
+      <NavBar title="选择模板" showBack />
       <View className={styles.header}>
         <Text className={styles.headerTitle}>行程模板</Text>
         <Text className={styles.headerSubtitle}>
