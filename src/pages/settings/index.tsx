@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, Image, Switch, Input } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
@@ -6,14 +6,14 @@ import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const SettingsPage: React.FC = () => {
-  const { currentUser, updateCurrentUser } = useTripStore();
+  const { currentUser, updateCurrentUser, logout } = useTripStore();
   const [notifyEnabled, setNotifyEnabled] = useState(true);
   const [splitType, setSplitType] = useState('均摊');
   const [cacheSize, setCacheSize] = useState('12.5MB');
 
   const [showNicknameModal, setShowNicknameModal] = useState(false);
   const [nicknameInput, setNicknameInput] = useState(currentUser.nickname);
-  const nicknameInputRef = useRef<any>(null);
+
 
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showAgreementModal, setShowAgreementModal] = useState(false);
@@ -51,14 +51,17 @@ const SettingsPage: React.FC = () => {
     setShowNicknameModal(true);
   }, [currentUser.nickname]);
 
-  const handleNicknameConfirm = useCallback(() => {
+  const handleNicknameConfirm = useCallback(async () => {
     if (!nicknameInput.trim()) {
       Taro.showToast({ title: '昵称不能为空', icon: 'none' });
       return;
     }
-    updateCurrentUser({ nickname: nicknameInput.trim() });
-    setShowNicknameModal(false);
-    Taro.showToast({ title: '修改成功', icon: 'success' });
+    try {
+      await updateCurrentUser({ nickname: nicknameInput.trim() });
+      setShowNicknameModal(false);
+      Taro.showToast({ title: '修改成功', icon: 'success' });
+    } catch (err) {
+    }
   }, [nicknameInput, updateCurrentUser]);
 
   const handleAvatarClick = useCallback(() => {
@@ -66,10 +69,13 @@ const SettingsPage: React.FC = () => {
       count: 1,
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
-      success: (res) => {
+      success: async (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        updateCurrentUser({ avatar: tempFilePath });
-        Taro.showToast({ title: '头像已更新', icon: 'success' });
+        try {
+          await updateCurrentUser({ avatar: tempFilePath });
+          Taro.showToast({ title: '头像已更新', icon: 'success' });
+        } catch (err) {
+        }
       },
     });
   }, [updateCurrentUser]);
@@ -100,11 +106,12 @@ const SettingsPage: React.FC = () => {
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
+          logout();
           Taro.showToast({ title: '已退出登录', icon: 'success' });
         }
       },
     });
-  }, []);
+  }, [logout]);
 
   const handleItemClick = useCallback((key: string) => {
     switch (key) {

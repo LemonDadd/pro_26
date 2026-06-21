@@ -10,7 +10,7 @@ import Taro, { useRouter } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import CategoryIcon from '@/components/CategoryIcon';
-import { categoryLabels, formatDate, formatMoney } from '@/utils/format';
+import { categoryLabels, formatTimestamp, formatMoney } from '@/utils/format';
 import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
@@ -26,7 +26,7 @@ const ExpenseDetailPage: React.FC = () => {
   );
 
   const expense = useMemo(
-    () => currentTrip?.expenses.find((e) => e.id === expenseId),
+    () => currentTrip?.expenses?.find((e) => e.id === expenseId),
     [currentTrip, expenseId]
   );
 
@@ -56,13 +56,16 @@ const ExpenseDetailPage: React.FC = () => {
     Taro.showModal({
       title: '删除确认',
       content: '确定要删除这笔费用吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          deleteExpense(currentTripId, expenseId);
-          Taro.showToast({ title: '已删除', icon: 'success' });
-          setTimeout(() => {
-            Taro.navigateBack();
-          }, 1000);
+          try {
+            await deleteExpense(currentTripId, expenseId);
+            Taro.showToast({ title: '已删除', icon: 'success' });
+            setTimeout(() => {
+              Taro.navigateBack();
+            }, 1000);
+          } catch (err) {
+          }
         }
       },
     });
@@ -97,7 +100,7 @@ const ExpenseDetailPage: React.FC = () => {
         <Text className={styles.amountText}>¥{formatMoney(expense.amount)}</Text>
         <Text className={styles.descText}>{expense.description}</Text>
         <Text className={styles.metaText}>
-          {formatDate(expense.createdAt)}
+          {formatTimestamp(expense.createdAt)}
         </Text>
       </View>
 

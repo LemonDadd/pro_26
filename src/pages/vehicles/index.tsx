@@ -5,7 +5,7 @@ import {
   ScrollView,
   Button,
 } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import { formatMoney } from '@/utils/format';
@@ -13,7 +13,7 @@ import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const VehiclesPage: React.FC = () => {
-  const { trips, currentTripId } = useTripStore();
+  const { trips, currentTripId, fetchVehicles } = useTripStore();
 
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
@@ -23,6 +23,12 @@ const VehiclesPage: React.FC = () => {
   const vehicles = currentTrip?.vehicles || [];
   const members = currentTrip?.members || [];
   const expenses = currentTrip?.expenses || [];
+
+  useDidShow(() => {
+    if (currentTripId) {
+      fetchVehicles(currentTripId).catch(() => {});
+    }
+  });
 
   const getOwnerFuelCost = useCallback(
     (ownerId: string) => {

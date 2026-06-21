@@ -8,10 +8,10 @@ import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const MinePage: React.FC = () => {
-  const { trips, currentUser } = useTripStore();
+  const { trips, currentUser, fetchTrips } = useTripStore();
 
   useDidShow(() => {
-    console.log('[Mine] 页面显示');
+    fetchTrips().catch(() => {});
   });
 
   const myTrips = trips.filter((t) =>

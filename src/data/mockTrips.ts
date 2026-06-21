@@ -1,4 +1,4 @@
-import { Trip, User, Expense, TripDayPlan, Vehicle, Activity, Participant } from '@/types';
+import { Trip, User, Expense, TripDayPlan, Vehicle, Participant } from '@/types';
 
 export const mockCurrentUser: User = {
   id: 'user_001',

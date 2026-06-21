@@ -6,7 +6,7 @@ import {
   Image,
   Input,
 } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
@@ -14,11 +14,12 @@ import { formatMoney } from '@/utils/format';
 import styles from './index.module.scss';
 
 const MembersPage: React.FC = () => {
-  const { trips, currentTripId, addMember } = useTripStore();
+  const { trips, currentTripId, addMember, generateInviteCode, joinByCode, fetchMembers } = useTripStore();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [newNickname, setNewNickname] = useState('');
+  const [inviteResult, setInviteResult] = useState<{ inviteCode: string; qrCodeUrl: string; expireAt: number } | null>(null);
 
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
@@ -27,6 +28,12 @@ const MembersPage: React.FC = () => {
 
   const members = currentTrip?.members || [];
   const expenses = currentTrip?.expenses || [];
+
+  useDidShow(() => {
+    if (currentTripId) {
+      fetchMembers(currentTripId).catch(() => {});
+    }
+  });
 
   const handleAddMember = useCallback(() => {
     Taro.showActionSheet({
@@ -38,8 +45,12 @@ const MembersPage: React.FC = () => {
             Taro.scanCode({
               onlyFromCamera: false,
               scanType: ['qrCode'],
-              success: () => {
-                Taro.showToast({ title: '扫码成功，已加入', icon: 'success' });
+              success: async (res) => {
+                try {
+                  await joinByCode(res.result);
+                  Taro.showToast({ title: '扫码成功，已加入', icon: 'success' });
+                } catch (err) {
+                }
               },
               fail: () => {
                 Taro.showToast({ title: '扫码功能暂不可用', icon: 'none' });
@@ -53,40 +64,32 @@ const MembersPage: React.FC = () => {
     });
   }, []);
 
-  const handleAddConfirm = useCallback(() => {
+  const handleAddConfirm = useCallback(async () => {
     if (!newNickname.trim()) {
       Taro.showToast({ title: '请输入昵称', icon: 'none' });
       return;
     }
     if (!currentTripId) return;
-    const randomId = `user_${Date.now()}`;
-    addMember(currentTripId, {
-      id: randomId,
-      nickname: newNickname.trim(),
-      avatar: `https://picsum.photos/seed/${randomId}/200/200`,
-      role: 'member',
-    });
-    setNewNickname('');
-    setShowAddModal(false);
-    Taro.showToast({ title: '添加成功', icon: 'success' });
+    try {
+      await addMember(currentTripId, { nickname: newNickname.trim() });
+      setNewNickname('');
+      setShowAddModal(false);
+      Taro.showToast({ title: '添加成功', icon: 'success' });
+    } catch (err) {
+    }
   }, [newNickname, currentTripId, addMember]);
 
-  const handleInvite = useCallback(() => {
-    setShowInviteModal(true);
-  }, []);
+  const handleInvite = useCallback(async () => {
+    if (!currentTripId) return;
+    try {
+      const result = await generateInviteCode(currentTripId);
+      setInviteResult(result);
+      setShowInviteModal(true);
+    } catch (err) {
+    }
+  }, [currentTripId, generateInviteCode]);
 
-  const handleCloseModal = useCallback(() => {
-    setShowInviteModal(false);
-  }, []);
 
-  const handleModalMaskClick = useCallback((e) => {
-    e.stopPropagation();
-    setShowInviteModal(false);
-  }, []);
-
-  const handleModalContentClick = useCallback((e) => {
-    e.stopPropagation();
-  }, []);
 
   const getMemberStat = useCallback(
     (userId: string) => {
@@ -188,10 +191,12 @@ const MembersPage: React.FC = () => {
             </Text>
             <Image
               className={styles.qrcodeImg}
-              src="https://picsum.photos/400/400"
+              src={inviteResult?.qrCodeUrl || 'https://picsum.photos/400/400'}
               mode="aspectFit"
             />
-            <Text className={styles.modalTip}>扫码加入行程</Text>
+            <Text className={styles.modalTip}>
+              {inviteResult ? `邀请码：${inviteResult.inviteCode}` : '扫码加入行程'}
+            </Text>
           </View>
         </View>
       )}

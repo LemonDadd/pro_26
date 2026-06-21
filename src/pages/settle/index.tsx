@@ -1,60 +1,55 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { useDidShow } from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import SettlementItem from '@/components/SettlementItem';
 import EmptyState from '@/components/EmptyState';
 import NavBar from '@/components/NavBar';
-import {
-  calculateUserBalances,
-  simplifyDebts,
-  getTotalExpense,
-  getUserById,
-} from '@/utils/aaCalculator';
-import { formatMoney } from '@/utils/format';
+import { getUserById } from '@/utils/aaCalculator';
+import type { SettlementPlan } from '@/types';
 import styles from './index.module.scss';
 
 const SettlePage: React.FC = () => {
-  const { trips, currentTripId, markSettled, isSettled } = useTripStore();
+  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled } = useTripStore();
+  const [plan, setPlan] = useState<SettlementPlan | null>(null);
 
   useDidShow(() => {
-    console.log('[Settle] 页面显示');
+    if (currentTripId) {
+      fetchSettlement(currentTripId)
+        .then((p) => setPlan(p))
+        .catch(() => {});
+    }
   });
 
-  const currentTrip = useMemo(
-    () => trips.find((t) => t.id === currentTripId),
-    [trips, currentTripId]
-  );
-
-  const expenses = currentTrip?.expenses || [];
+  const currentTrip = trips.find((t) => t.id === currentTripId);
   const members = currentTrip?.members || [];
 
-  const balances = useMemo(() => {
-    return calculateUserBalances(expenses, members);
-  }, [expenses, members]);
-
-  const settlements = useMemo(() => {
-    return simplifyDebts(balances, members);
-  }, [balances, members]);
-
-  const totalExpense = getTotalExpense(expenses);
+  const balances = plan?.userBalances || [];
+  const settlements = plan?.settlements || [];
+  const totalExpense = plan?.totalExpense || 0;
 
   const handleMarkSettled = useCallback(
-    (fromUserId: string, toUserId: string, amount: number) => {
+    (settlementId: string | undefined, localKey: string) => {
       Taro.showModal({
         title: '确认结清',
         content: '确定要标记这笔账为已结清吗？',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            markSettled(fromUserId, toUserId, amount);
-            Taro.showToast({ title: '已标记结清', icon: 'success' });
+            try {
+              if (settlementId) {
+                await markSettled(settlementId, localKey);
+              } else {
+                toggleSettled(localKey);
+              }
+              Taro.showToast({ title: '已标记结清', icon: 'success' });
+            } catch (err) {
+            }
           }
         },
       });
     },
-    [markSettled]
+    [markSettled, toggleSettled]
   );
 
   const handleShareSettlement = useCallback(() => {
@@ -65,8 +60,7 @@ const SettlePage: React.FC = () => {
   }, []);
 
   const getBalanceUser = (userId: string) => {
-    const user = getUserById(members, userId);
-    return user;
+    return getUserById(members, userId);
   };
 
   const getBalanceLabel = (balance: number) => {
@@ -160,19 +154,18 @@ const SettlePage: React.FC = () => {
               {settlements.map((s, index) => {
                 const fromUser = getBalanceUser(s.fromUserId);
                 const toUser = getBalanceUser(s.toUserId);
-                const settled = isSettled(s.fromUserId, s.toUserId, s.amount);
+                const localKey = s.id || `${s.fromUserId}-${s.toUserId}-${s.amount}`;
+                const settled = s.settled || s.status === 'settled' || isItemSettled(localKey);
                 return (
                   fromUser &&
                   toUser && (
                     <SettlementItem
-                      key={index}
+                      key={s.id || index}
                       fromUser={fromUser}
                       toUser={toUser}
                       amount={s.amount}
                       settled={settled}
-                      onSettle={() =>
-                        handleMarkSettled(s.fromUserId, s.toUserId, s.amount)
-                      }
+                      onSettle={() => handleMarkSettled(s.id, localKey)}
                     />
                   )
                 );

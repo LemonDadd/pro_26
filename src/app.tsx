@@ -1,16 +1,22 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDidShow, useDidHide } from '@tarojs/taro';
-// 全局样式
+import { useTripStore } from '@/store/useTripStore';
 import './app.scss';
 
 function App(props) {
-  // 可以使用所有的 React Hooks
-  useEffect(() => {});
+  const initApp = useTripStore((s) => s.initApp);
+  const initialized = useTripStore((s) => s.initialized);
 
-  // 对应 onShow
-  useDidShow(() => {});
+  useEffect(() => {
+    initApp();
+  }, [initApp]);
 
-  // 对应 onHide
+  useDidShow(() => {
+    if (!initialized) {
+      initApp();
+    }
+  });
+
   useDidHide(() => {});
 
   return props.children;

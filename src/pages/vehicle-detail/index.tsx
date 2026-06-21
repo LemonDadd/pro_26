@@ -10,7 +10,7 @@ import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
 import ExpenseItem from '@/components/ExpenseItem';
-import { formatMoney, formatDate } from '@/utils/format';
+import { formatMoney } from '@/utils/format';
 import styles from './index.module.scss';
 
 const VehicleDetailPage: React.FC = () => {
@@ -60,13 +60,16 @@ const VehicleDetailPage: React.FC = () => {
     Taro.showModal({
       title: '删除确认',
       content: '确定要删除这辆车吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          deleteVehicle(currentTripId, vehicleId);
-          Taro.showToast({ title: '已删除', icon: 'success' });
-          setTimeout(() => {
-            Taro.navigateBack();
-          }, 1000);
+          try {
+            await deleteVehicle(currentTripId, vehicleId);
+            Taro.showToast({ title: '已删除', icon: 'success' });
+            setTimeout(() => {
+              Taro.navigateBack();
+            }, 1000);
+          } catch (err) {
+          }
         }
       },
     });

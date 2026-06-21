@@ -68,16 +68,14 @@ const FuelSubsidyPage: React.FC = () => {
     }
   }, [fuelAmount, fuelPrice]);
 
-  const handleDateChange = useCallback((e: any) => {
-    setFuelDate(e.detail.value);
-  }, []);
+
 
   const handleVehicleSelect = useCallback((id: string) => {
     setSelectedVehicleId(id);
     setShowVehiclePicker(false);
   }, []);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!currentTripId) {
       Taro.showToast({ title: '请先选择行程', icon: 'none' });
       return;
@@ -109,22 +107,23 @@ const FuelSubsidyPage: React.FC = () => {
     const payerId = selectedVehicle?.ownerId || currentUser.id;
     const participants = isSplit ? members.map((m) => m.id) : [payerId];
 
-    addExpense({
-      tripId: currentTripId,
-      amount: Number(totalNum.toFixed(2)),
-      category: 'fuel',
-      description: `油费补贴 - ${selectedVehicle?.model || '车辆'}`,
-      payerId,
-      participants,
-      splitType: 'equal',
-      note: note.trim() || undefined,
-      createdBy: currentUser.id,
-    });
+    try {
+      await addExpense(currentTripId, {
+        amount: Number(totalNum.toFixed(2)),
+        category: 'fuel',
+        description: `油费补贴 - ${selectedVehicle?.model || '车辆'}`,
+        payerId,
+        participants,
+        splitType: 'equal',
+        note: note.trim() || undefined,
+      });
 
-    Taro.showToast({ title: '录入成功', icon: 'success' });
-    setTimeout(() => {
-      Taro.navigateBack();
-    }, 1000);
+      Taro.showToast({ title: '录入成功', icon: 'success' });
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } catch (err) {
+    }
   }, [
     currentTripId,
     selectedVehicleId,
@@ -278,7 +277,7 @@ const FuelSubsidyPage: React.FC = () => {
               placeholderClass={styles.inputPlaceholder}
               value={note}
               onInput={(e) => setNote(e.detail.value)}
-              maxLength={200}
+              maxlength={200}
               autoHeight
             />
           </View>

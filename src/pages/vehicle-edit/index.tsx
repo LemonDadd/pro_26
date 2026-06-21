@@ -67,7 +67,7 @@ const VehicleEditPage: React.FC = () => {
     setShowOwnerPicker(false);
   }, []);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!currentTripId) {
       Taro.showToast({ title: '请先选择行程', icon: 'none' });
       return;
@@ -92,17 +92,20 @@ const VehicleEditPage: React.FC = () => {
       ownerId,
     };
 
-    if (isEdit) {
-      updateVehicle(currentTripId, vehicleId!, vehicleData);
-      Taro.showToast({ title: '保存成功', icon: 'success' });
-    } else {
-      addVehicle(currentTripId, vehicleData);
-      Taro.showToast({ title: '添加成功', icon: 'success' });
-    }
+    try {
+      if (isEdit) {
+        await updateVehicle(currentTripId, vehicleId!, vehicleData);
+        Taro.showToast({ title: '保存成功', icon: 'success' });
+      } else {
+        await addVehicle(currentTripId, vehicleData);
+        Taro.showToast({ title: '添加成功', icon: 'success' });
+      }
 
-    setTimeout(() => {
-      Taro.navigateBack();
-    }, 1000);
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } catch (err) {
+    }
   }, [
     currentTripId,
     model,
@@ -130,7 +133,7 @@ const VehicleEditPage: React.FC = () => {
                 placeholderClass={styles.inputPlaceholder}
                 value={model}
                 onInput={(e) => setModel(e.detail.value)}
-                maxLength={50}
+                maxlength={50}
               />
             </View>
           </View>
@@ -143,7 +146,7 @@ const VehicleEditPage: React.FC = () => {
                 placeholderClass={styles.inputPlaceholder}
                 value={plateNumber}
                 onInput={(e) => setPlateNumber(e.detail.value)}
-                maxLength={20}
+                maxlength={20}
               />
             </View>
           </View>

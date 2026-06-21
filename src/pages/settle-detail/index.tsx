@@ -1,53 +1,36 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Button,
 } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
-import {
-  calculateUserBalances,
-  simplifyDebts,
-  getTotalExpense,
-  getAveragePerPerson,
-} from '@/utils/aaCalculator';
 import { formatMoney } from '@/utils/format';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
+import type { SettlementPlan } from '@/types';
 import styles from './index.module.scss';
 
 const SettleDetailPage: React.FC = () => {
-  const { trips, currentTripId, toggleSettled, isItemSettled } = useTripStore();
+  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled } = useTripStore();
+  const [plan, setPlan] = useState<SettlementPlan | null>(null);
 
-  const currentTrip = useMemo(
-    () => trips.find((t) => t.id === currentTripId),
-    [trips, currentTripId]
-  );
+  useDidShow(() => {
+    if (currentTripId) {
+      fetchSettlement(currentTripId)
+        .then((p) => setPlan(p))
+        .catch(() => {});
+    }
+  });
 
-  const expenses = currentTrip?.expenses || [];
+  const currentTrip = trips.find((t) => t.id === currentTripId);
   const members = currentTrip?.members || [];
 
-  const balances = useMemo(
-    () => calculateUserBalances(expenses, members),
-    [expenses, members]
-  );
-
-  const settlements = useMemo(
-    () => simplifyDebts(balances, members),
-    [balances, members]
-  );
-
-  const totalExpense = useMemo(
-    () => getTotalExpense(expenses),
-    [expenses]
-  );
-
-  const averagePerPerson = useMemo(
-    () => getAveragePerPerson(expenses, members.length),
-    [expenses, members.length]
-  );
+  const settlements = plan?.settlements || [];
+  const totalExpense = plan?.totalExpense || 0;
+  const averagePerPerson = plan?.avgPerPerson || 0;
 
   const getUserById = useCallback(
     (id: string) => members.find((m) => m.id === id),
@@ -56,7 +39,6 @@ const SettleDetailPage: React.FC = () => {
 
   const handleTransfer = useCallback(
     (item: { fromUserId: string; toUserId: string; amount: number }) => {
-      const fromUser = getUserById(item.fromUserId);
       const toUser = getUserById(item.toUserId);
       Taro.showModal({
         title: '转账提示',
@@ -71,15 +53,24 @@ const SettleDetailPage: React.FC = () => {
   );
 
   const handleSettle = useCallback(
-    (itemId: string) => {
-      const wasSettled = isItemSettled(itemId);
-      toggleSettled(itemId);
-      Taro.showToast({
-        title: wasSettled ? '已取消结清' : '已标记结清',
-        icon: 'success',
-      });
+    (settlementId: string | undefined, localKey: string) => {
+      const wasSettled = isItemSettled(localKey);
+      (async () => {
+        try {
+          if (settlementId && !wasSettled) {
+            await markSettled(settlementId, localKey);
+          } else {
+            toggleSettled(localKey);
+          }
+          Taro.showToast({
+            title: wasSettled ? '已取消结清' : '已标记结清',
+            icon: 'success',
+          });
+        } catch (err) {
+        }
+      })();
     },
-    [isItemSettled, toggleSettled]
+    [isItemSettled, markSettled, toggleSettled]
   );
 
   const handleShare = useCallback(() => {
@@ -137,11 +128,11 @@ const SettleDetailPage: React.FC = () => {
             {settlements.map((item) => {
               const fromUser = getUserById(item.fromUserId);
               const toUser = getUserById(item.toUserId);
-              const itemId = `${item.fromUserId}-${item.toUserId}-${item.amount}`;
-              const isSettled = isItemSettled(itemId);
+              const localKey = item.id || `${item.fromUserId}-${item.toUserId}-${item.amount}`;
+              const isSettled = item.settled || item.status === 'settled' || isItemSettled(localKey);
 
               return (
-                <View key={itemId} className={styles.settleItem}>
+                <View key={localKey} className={styles.settleItem}>
                   <View className={styles.settleFrom}>
                     <Avatar
                       src={fromUser?.avatar}
@@ -182,7 +173,7 @@ const SettleDetailPage: React.FC = () => {
                     <Button
                       className={styles.actionBtn}
                       style={{ background: isSettled ? '#e5e6eb' : '#ff6b35' }}
-                      onClick={() => handleSettle(itemId)}
+                      onClick={() => handleSettle(item.id, localKey)}
                     >
                       <Text
                         className={styles.actionBtnText}

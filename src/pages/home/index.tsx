@@ -16,20 +16,24 @@ import { getTotalExpense } from '@/utils/aaCalculator';
 import styles from './index.module.scss';
 
 const HomePage: React.FC = () => {
-  const { trips, currentUser, setCurrentTrip } = useTripStore();
-  const [refreshing, setRefreshing] = useState(false);
+  const { trips, currentUser, setCurrentTrip, fetchTrips, initialized } = useTripStore();
+  const [, setRefreshing] = useState(false);
 
   useDidShow(() => {
-    console.log('[Home] 页面显示');
+    if (initialized && trips.length === 0) {
+      fetchTrips();
+    }
   });
 
   usePullDownRefresh(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      Taro.stopPullDownRefresh();
-      Taro.showToast({ title: '刷新成功', icon: 'success' });
-    }, 1000);
+    fetchTrips()
+      .then(() => Taro.showToast({ title: '刷新成功', icon: 'success' }))
+      .catch(() => {})
+      .finally(() => {
+        setRefreshing(false);
+        Taro.stopPullDownRefresh();
+      });
   });
 
   const handleCreateTrip = useCallback(() => {
@@ -67,7 +71,7 @@ const HomePage: React.FC = () => {
   const activeTrips = trips.filter((t) => t.status === 'active');
   const totalTrips = trips.length;
   const totalExpense = trips.reduce(
-    (sum, t) => sum + getTotalExpense(t.expenses || []),
+    (sum, t) => sum + (t.stats?.totalExpense ?? getTotalExpense(t.expenses || [])),
     0
   );
 

@@ -8,6 +8,7 @@ interface AvatarProps {
   name?: string;
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -15,11 +16,12 @@ const Avatar: React.FC<AvatarProps> = ({
   name = '',
   size = 'medium',
   className,
+  style,
 }) => {
   const firstChar = name.charAt(0);
 
   return (
-    <View className={classNames(styles.avatar, styles[size], className)}>
+    <View className={classNames(styles.avatar, styles[size], className)} style={style}>
       {src ? (
         <Image
           className={styles.avatarImg}

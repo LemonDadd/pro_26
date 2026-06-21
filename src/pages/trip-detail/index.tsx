@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { View, Text, ScrollView, Button } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { useDidShow } from '@tarojs/taro';
@@ -8,20 +8,22 @@ import NavBar from '@/components/NavBar';
 import {
   getDaysBetween,
   formatDate,
-  formatDateFull,
 } from '@/utils/format';
 import { getTotalExpense, getAveragePerPerson } from '@/utils/aaCalculator';
 import styles from './index.module.scss';
 
 const TripDetailPage: React.FC = () => {
   const router = useRouter();
-  const { trips, setCurrentTrip } = useTripStore();
-
-  useDidShow(() => {
-    console.log('[TripDetail] 页面显示');
-  });
+  const { trips, setCurrentTrip, fetchTripDetail, loading } = useTripStore();
+  const [loaded, setLoaded] = useState(false);
 
   const tripId = router.params.id;
+
+  useDidShow(() => {
+    if (tripId) {
+      fetchTripDetail(tripId).finally(() => setLoaded(true));
+    }
+  });
 
   const trip = useMemo(() => {
     return trips.find((t) => t.id === tripId);
@@ -37,13 +39,7 @@ const TripDetailPage: React.FC = () => {
     Taro.navigateTo({ url: `/pages/members/index?tripId=${tripId}` });
   }, [tripId]);
 
-  const handleShareQr = useCallback(() => {
-    Taro.showToast({ title: '生成小程序码', icon: 'loading' });
-    setTimeout(() => {
-      Taro.hideToast();
-      Taro.showToast({ title: '已生成', icon: 'success' });
-    }, 1500);
-  }, []);
+
 
   const handleEditTrip = useCallback(() => {
     Taro.navigateTo({ url: `/pages/create-trip/index?tripId=${tripId}` });
@@ -61,7 +57,7 @@ const TripDetailPage: React.FC = () => {
       <View className={styles.page}>
         <NavBar title="行程详情" showBack />
         <View style={{ padding: 100, textAlign: 'center' }}>
-          <Text>行程不存在</Text>
+          <Text>{loading || !loaded ? '加载中...' : '行程不存在'}</Text>
         </View>
       </View>
     );

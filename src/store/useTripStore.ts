@@ -1,7 +1,30 @@
 import { create } from 'zustand';
-import { Trip, Expense, User, Vehicle, SettlementItem, Activity, Participant, TripDayPlan } from '@/types';
-import { generateId } from '@/utils/format';
-import { mockTrips, mockCurrentUser } from '@/data/mockTrips';
+import Taro from '@tarojs/taro';
+import type {
+  Trip,
+  Expense,
+  User,
+  Vehicle,
+  Activity,
+  SettlementPlan,
+} from '@/types';
+import * as authService from '@/services/auth';
+import * as tripService from '@/services/trip';
+import * as expenseService from '@/services/expense';
+import * as memberService from '@/services/member';
+import * as vehicleService from '@/services/vehicle';
+import * as settlementService from '@/services/settlement';
+import * as activityService from '@/services/activity';
+import { getToken, clearAuth } from '@/services/request';
+
+const DEV_LOGIN_CODE = 'dev_mock_code_001';
+
+const EMPTY_USER: User = {
+  id: '',
+  nickname: '',
+  avatar: '',
+  role: 'member',
+};
 
 interface TripStore {
   trips: Trip[];
@@ -9,57 +32,111 @@ interface TripStore {
   currentUser: User;
   settledItems: Record<string, boolean>;
   activities: Activity[];
+  loading: boolean;
+  initialized: boolean;
+
+  initApp: () => Promise<void>;
+  logout: () => void;
 
   setCurrentTrip: (tripId: string) => void;
   getCurrentTrip: () => Trip | undefined;
-  addTrip: (trip: Omit<Trip, 'id' | 'createdAt' | 'inviteCode' | 'leaderId'> & { leaderId?: string }) => void;
-  updateTrip: (tripId: string, updates: Partial<Trip>) => void;
-  updateCurrentUser: (updates: Partial<User>) => void;
 
-  addExpense: (expense: Omit<Expense, 'id' | 'createdAt'> & { participants: string[] | Participant[] }) => void;
-  updateExpense: (tripId: string, expenseId: string, updates: Partial<Expense>) => void;
-  deleteExpense: (tripId: string, expenseId: string) => void;
+  fetchTrips: (status?: 'active' | 'completed') => Promise<Trip[]>;
+  fetchTripDetail: (tripId: string) => Promise<Trip | undefined>;
+
+  addTrip: (params: tripService.CreateTripParams) => Promise<Trip>;
+  updateTrip: (tripId: string, updates: tripService.UpdateTripParams) => Promise<void>;
+  deleteTrip: (tripId: string) => Promise<void>;
+  completeTrip: (tripId: string) => Promise<void>;
+
+  fetchExpenses: (tripId: string) => Promise<void>;
+  addExpense: (
+    tripId: string,
+    params: expenseService.CreateExpenseParams
+  ) => Promise<Expense>;
+  updateExpense: (
+    tripId: string,
+    expenseId: string,
+    updates: expenseService.UpdateExpenseParams
+  ) => Promise<void>;
+  deleteExpense: (tripId: string, expenseId: string) => Promise<void>;
   getExpenseById: (expenseId: string) => Expense | undefined;
 
-  addMember: (tripId: string, member: Omit<User, 'id' | 'role'> & { id?: string; role?: 'leader' | 'member' }) => void;
-  removeMember: (tripId: string, userId: string) => void;
+  fetchMembers: (tripId: string) => Promise<void>;
+  addMember: (tripId: string, params: memberService.AddMemberParams) => Promise<void>;
+  removeMember: (tripId: string, userId: string) => Promise<void>;
+  generateInviteCode: (
+    tripId: string
+  ) => Promise<{ inviteCode: string; qrCodeUrl: string; expireAt: number }>;
+  joinByCode: (inviteCode: string) => Promise<void>;
 
-  addVehicle: (tripId: string, vehicle: Omit<Vehicle, 'id' | 'tripId'>) => void;
-  updateVehicle: (tripId: string, vehicleId: string, updates: Partial<Vehicle>) => void;
-  deleteVehicle: (tripId: string, vehicleId: string) => void;
+  fetchVehicles: (tripId: string) => Promise<void>;
+  addVehicle: (tripId: string, params: vehicleService.CreateVehicleParams) => Promise<Vehicle>;
+  updateVehicle: (
+    tripId: string,
+    vehicleId: string,
+    updates: vehicleService.UpdateVehicleParams
+  ) => Promise<void>;
+  deleteVehicle: (tripId: string, vehicleId: string) => Promise<void>;
 
-  markSettled: (fromUserId: string, toUserId: string, amount: number) => void;
-  isSettled: (fromUserId: string, toUserId: string, amount: number) => boolean;
+  fetchSettlement: (tripId: string) => Promise<SettlementPlan>;
+  markSettled: (settlementId: string, localKey: string) => Promise<void>;
   toggleSettled: (key: string) => void;
   isItemSettled: (key: string) => boolean;
 
-  addActivity: (activity: Omit<Activity, 'id' | 'createdAt'>) => void;
+  fetchActivities: (tripId: string) => Promise<void>;
   getActivitiesByTrip: (tripId: string) => Activity[];
+
+  updateCurrentUser: (updates: authService.UpdateProfileParams) => Promise<void>;
 }
 
-function buildParticipantsFromUserIds(
-  amount: number,
-  userIds: string[],
-  members: User[]
-): Participant[] {
-  const perPerson = Number((amount / userIds.length).toFixed(2));
-  return userIds.map((id) => {
-    const user = members.find((m) => m.id === id);
-    return {
-      id,
-      nickname: user?.nickname || '',
-      avatar: user?.avatar || '',
-      splitAmount: perPerson,
-    };
-  });
+function upsertTrip(list: Trip[], trip: Trip): Trip[] {
+  const exists = list.some((t) => t.id === trip.id);
+  return exists ? list.map((t) => (t.id === trip.id ? trip : t)) : [trip, ...list];
 }
 
 export const useTripStore = create<TripStore>((set, get) => ({
-  trips: mockTrips,
-  currentTripId: mockTrips[0]?.id || null,
-  currentUser: mockCurrentUser,
+  trips: [],
+  currentTripId: null,
+  currentUser: EMPTY_USER,
   settledItems: {},
   activities: [],
+  loading: false,
+  initialized: false,
+
+  initApp: async () => {
+    if (get().initialized) return;
+    set({ loading: true });
+    try {
+      const token = getToken();
+      let user: User;
+      if (token) {
+        user = (await authService.getCurrentUser()) as User;
+      } else {
+        const result = await authService.wxLogin({ code: DEV_LOGIN_CODE });
+        user = { ...result.user } as User;
+      }
+      set({ currentUser: { ...EMPTY_USER, ...user } });
+      await get().fetchTrips();
+    } catch (err) {
+      clearAuth();
+      Taro.showToast({ title: '初始化失败,请重试', icon: 'none' });
+    } finally {
+      set({ loading: false, initialized: true });
+    }
+  },
+
+  logout: () => {
+    clearAuth();
+    set({
+      currentUser: EMPTY_USER,
+      trips: [],
+      currentTripId: null,
+      activities: [],
+      settledItems: {},
+      initialized: false,
+    });
+  },
 
   setCurrentTrip: (tripId) => set({ currentTripId: tripId }),
 
@@ -68,111 +145,104 @@ export const useTripStore = create<TripStore>((set, get) => ({
     return trips.find((t) => t.id === currentTripId);
   },
 
-  addTrip: (trip) => {
-    const { currentUser } = get();
-    const leaderId = trip.leaderId || currentUser.id;
-    const leader = currentUser;
-    const newTrip: Trip = {
-      ...trip,
-      id: generateId(),
-      createdAt: Date.now(),
-      leaderId,
-      leader,
-      members: [{ ...currentUser, role: 'leader' as const }],
-      status: trip.status || 'active',
-      inviteCode: generateId().slice(0, 6).toUpperCase(),
-    } as Trip;
+  fetchTrips: async (status) => {
+    const page = await tripService.listTrips({ status, pageSize: 50 });
     set((state) => ({
-      trips: [newTrip, ...state.trips],
-      currentTripId: newTrip.id,
+      trips: page.list,
+      currentTripId: state.currentTripId || page.list[0]?.id || null,
+    }));
+    return page.list;
+  },
+
+  fetchTripDetail: async (tripId) => {
+    set({ currentTripId: tripId, loading: true });
+    try {
+      const trip = await tripService.getTripDetail(tripId);
+      const [expensesPage, vehiclesPage, activitiesPage] = await Promise.all([
+        expenseService.listExpenses({ tripId, pageSize: 100 }),
+        vehicleService.listVehicles(tripId),
+        activityService.listActivities({ tripId, pageSize: 100 }),
+      ]);
+      const fullTrip: Trip = {
+        ...trip,
+        expenses: expensesPage.list,
+        vehicles: vehiclesPage.list,
+      };
+      set((state) => ({
+        trips: upsertTrip(state.trips, fullTrip),
+        activities: activitiesPage.list,
+      }));
+      return fullTrip;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  addTrip: async (params) => {
+    const trip = await tripService.createTrip(params);
+    set((state) => ({
+      trips: [trip, ...state.trips],
+      currentTripId: trip.id,
+    }));
+    return trip;
+  },
+
+  updateTrip: async (tripId, updates) => {
+    const trip = await tripService.updateTrip(tripId, updates);
+    set((state) => ({ trips: upsertTrip(state.trips, trip) }));
+  },
+
+  deleteTrip: async (tripId) => {
+    await tripService.deleteTrip(tripId);
+    set((state) => ({
+      trips: state.trips.filter((t) => t.id !== tripId),
+      currentTripId:
+        state.currentTripId === tripId ? state.trips[0]?.id || null : state.currentTripId,
     }));
   },
 
-  updateTrip: (tripId, updates) => {
+  completeTrip: async (tripId) => {
+    const trip = await tripService.completeTrip(tripId);
+    set((state) => ({ trips: upsertTrip(state.trips, trip) }));
+  },
+
+  fetchExpenses: async (tripId) => {
+    const page = await expenseService.listExpenses({ tripId, pageSize: 100 });
     set((state) => ({
       trips: state.trips.map((t) =>
-        t.id === tripId ? { ...t, ...updates } : t
+        t.id === tripId ? { ...t, expenses: page.list } : t
       ),
     }));
   },
 
-  addExpense: (expense) => {
-    const { trips, currentUser } = get();
-    const trip = trips.find((t) => t.id === expense.tripId);
-    const members = trip?.members || [];
-
-    const participantList: Participant[] = Array.isArray(expense.participants) && expense.participants.length > 0 && typeof expense.participants[0] === 'string'
-      ? buildParticipantsFromUserIds(expense.amount, expense.participants as string[], members)
-      : (expense.participants as Participant[]);
-
-    const payer = members.find((m) => m.id === expense.payerId);
-
-    const newExpense: Expense = {
-      ...expense,
-      participants: participantList,
-      payer,
-      id: generateId(),
-      createdAt: Date.now(),
-      createdBy: expense.createdBy || currentUser.id,
-    } as Expense;
-
+  addExpense: async (tripId, params) => {
+    const expense = await expenseService.createExpense(tripId, params);
     set((state) => ({
       trips: state.trips.map((t) =>
-        t.id === expense.tripId
-          ? { ...t, expenses: [newExpense, ...(t.expenses || [])] }
+        t.id === tripId
+          ? { ...t, expenses: [expense, ...(t.expenses || [])] }
           : t
       ),
     }));
-
-    get().addActivity({
-      tripId: expense.tripId,
-      type: 'expense',
-      userId: expense.createdBy || currentUser.id,
-      content: `记了一笔：${expense.description}`,
-      amount: expense.amount,
-    });
+    return expense;
   },
 
-  updateExpense: (tripId, expenseId, updates) => {
-    const { trips } = get();
-    const trip = trips.find((t) => t.id === tripId);
-    const members = trip?.members || [];
-    const expense = trip?.expenses?.find((e) => e.id === expenseId);
-
-    let finalUpdates = { ...updates };
-    if (updates.participants && Array.isArray(updates.participants) && updates.participants.length > 0 && typeof updates.participants[0] === 'string') {
-      const amount = updates.amount || expense?.amount || 0;
-      finalUpdates.participants = buildParticipantsFromUserIds(
-        amount,
-        updates.participants as unknown as string[],
-        members
-      ) as unknown as Participant[];
-    }
-
+  updateExpense: async (tripId, expenseId, updates) => {
+    const expense = await expenseService.updateExpense(expenseId, updates);
     set((state) => ({
       trips: state.trips.map((t) =>
         t.id === tripId
           ? {
               ...t,
-              expenses: t.expenses?.map((e) =>
-                e.id === expenseId ? { ...e, ...finalUpdates } : e
-              ),
+              expenses: t.expenses?.map((e) => (e.id === expenseId ? expense : e)),
             }
           : t
       ),
     }));
-
-    get().addActivity({
-      tripId,
-      type: 'expense',
-      userId: get().currentUser.id,
-      content: `修改了费用：${updates.description || ''}`,
-      amount: updates.amount,
-    });
   },
 
-  deleteExpense: (tripId, expenseId) => {
-    const expense = get().getExpenseById(expenseId);
+  deleteExpense: async (tripId, expenseId) => {
+    await expenseService.deleteExpense(expenseId);
     set((state) => ({
       trips: state.trips.map((t) =>
         t.id === tripId
@@ -180,14 +250,6 @@ export const useTripStore = create<TripStore>((set, get) => ({
           : t
       ),
     }));
-
-    get().addActivity({
-      tripId,
-      type: 'expense',
-      userId: get().currentUser.id,
-      content: `删除了费用：${expense?.description || ''}`,
-      amount: expense ? -expense.amount : undefined,
-    });
   },
 
   getExpenseById: (expenseId) => {
@@ -199,29 +261,26 @@ export const useTripStore = create<TripStore>((set, get) => ({
     return undefined;
   },
 
-  addMember: (tripId, member) => {
-    const newMember: User = {
-      ...member,
-      id: member.id || generateId(),
-      role: member.role || 'member',
-    } as User;
+  fetchMembers: async (tripId) => {
+    const page = await memberService.listMembers(tripId);
     set((state) => ({
       trips: state.trips.map((t) =>
-        t.id === tripId
-          ? { ...t, members: [...t.members, newMember] }
-          : t
+        t.id === tripId ? { ...t, members: page.list } : t
       ),
     }));
-
-    get().addActivity({
-      tripId,
-      type: 'member_join',
-      userId: newMember.id,
-      content: '加入了行程',
-    });
   },
 
-  removeMember: (tripId, userId) => {
+  addMember: async (tripId, params) => {
+    const member = await memberService.addMember(tripId, params);
+    set((state) => ({
+      trips: state.trips.map((t) =>
+        t.id === tripId ? { ...t, members: [...t.members, member] } : t
+      ),
+    }));
+  },
+
+  removeMember: async (tripId, userId) => {
+    await memberService.removeMember(tripId, userId);
     set((state) => ({
       trips: state.trips.map((t) =>
         t.id === tripId
@@ -231,41 +290,56 @@ export const useTripStore = create<TripStore>((set, get) => ({
     }));
   },
 
-  addVehicle: (tripId, vehicle) => {
-    const { trips } = get();
-    const trip = trips.find((t) => t.id === tripId);
-    const owner = trip?.members.find((m) => m.id === vehicle.ownerId);
-    const newVehicle: Vehicle = {
-      ...vehicle,
-      id: generateId(),
-      tripId,
-      owner,
-    };
+  generateInviteCode: async (tripId) => {
+    const res = await memberService.generateInviteCode(tripId);
     set((state) => ({
       trips: state.trips.map((t) =>
-        t.id === tripId
-          ? { ...t, vehicles: [...(t.vehicles || []), newVehicle] }
-          : t
+        t.id === tripId ? { ...t, inviteCode: res.inviteCode } : t
+      ),
+    }));
+    return res;
+  },
+
+  joinByCode: async (inviteCode) => {
+    await memberService.joinByCode(inviteCode);
+    await get().fetchTrips();
+  },
+
+  fetchVehicles: async (tripId) => {
+    const page = await vehicleService.listVehicles(tripId);
+    set((state) => ({
+      trips: state.trips.map((t) =>
+        t.id === tripId ? { ...t, vehicles: page.list } : t
       ),
     }));
   },
 
-  updateVehicle: (tripId, vehicleId, updates) => {
+  addVehicle: async (tripId, params) => {
+    const vehicle = await vehicleService.createVehicle(tripId, params);
+    set((state) => ({
+      trips: state.trips.map((t) =>
+        t.id === tripId ? { ...t, vehicles: [...(t.vehicles || []), vehicle] } : t
+      ),
+    }));
+    return vehicle;
+  },
+
+  updateVehicle: async (tripId, vehicleId, updates) => {
+    const vehicle = await vehicleService.updateVehicle(vehicleId, updates);
     set((state) => ({
       trips: state.trips.map((t) =>
         t.id === tripId
           ? {
               ...t,
-              vehicles: t.vehicles?.map((v) =>
-                v.id === vehicleId ? { ...v, ...updates } : v
-              ),
+              vehicles: t.vehicles?.map((v) => (v.id === vehicleId ? vehicle : v)),
             }
           : t
       ),
     }));
   },
 
-  deleteVehicle: (tripId, vehicleId) => {
+  deleteVehicle: async (tripId, vehicleId) => {
+    await vehicleService.deleteVehicle(vehicleId);
     set((state) => ({
       trips: state.trips.map((t) =>
         t.id === tripId
@@ -275,16 +349,15 @@ export const useTripStore = create<TripStore>((set, get) => ({
     }));
   },
 
-  markSettled: (fromUserId, toUserId, amount) => {
-    const key = `${fromUserId}-${toUserId}-${amount}`;
-    set((state) => ({
-      settledItems: { ...state.settledItems, [key]: true },
-    }));
+  fetchSettlement: async (tripId) => {
+    return settlementService.getSettlementPlan(tripId);
   },
 
-  isSettled: (fromUserId, toUserId, amount) => {
-    const key = `${fromUserId}-${toUserId}-${amount}`;
-    return get().settledItems[key] || false;
+  markSettled: async (settlementId, localKey) => {
+    await settlementService.markSettled(settlementId);
+    set((state) => ({
+      settledItems: { ...state.settledItems, [localKey]: true },
+    }));
   },
 
   toggleSettled: (key) => {
@@ -303,24 +376,19 @@ export const useTripStore = create<TripStore>((set, get) => ({
     return get().settledItems[key] || false;
   },
 
-  addActivity: (activity) => {
-    const newActivity: Activity = {
-      ...activity,
-      id: generateId(),
-      createdAt: Date.now(),
-    };
-    set((state) => ({
-      activities: [newActivity, ...state.activities],
-    }));
+  fetchActivities: async (tripId) => {
+    const page = await activityService.listActivities({ tripId, pageSize: 100 });
+    set({ activities: page.list });
   },
 
   getActivitiesByTrip: (tripId) => {
     return get().activities.filter((a) => a.tripId === tripId);
   },
 
-  updateCurrentUser: (updates) => {
+  updateCurrentUser: async (updates) => {
+    const user = await authService.updateProfile(updates);
     set((state) => ({
-      currentUser: { ...state.currentUser, ...updates },
+      currentUser: { ...state.currentUser, ...user },
     }));
   },
 }));

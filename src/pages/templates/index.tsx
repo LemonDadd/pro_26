@@ -1,16 +1,25 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Image,
 } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { tripTemplates } from '@/data/templates';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { listTemplates } from '@/services/template';
+import type { TripTemplate } from '@/types';
 import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const TemplatesPage: React.FC = () => {
+  const [templates, setTemplates] = useState<TripTemplate[]>([]);
+
+  useDidShow(() => {
+    listTemplates({ pageSize: 50 })
+      .then((res) => setTemplates(res.list))
+      .catch(() => {});
+  });
+
   const handleSelectTemplate = useCallback((templateId: string) => {
     Taro.navigateTo({
       url: `/pages/create-trip/index?templateId=${templateId}`,
@@ -29,7 +38,7 @@ const TemplatesPage: React.FC = () => {
 
       <ScrollView scrollY>
         <View className={styles.templateList}>
-          {tripTemplates.map((template) => (
+          {templates.map((template) => (
             <View
               key={template.id}
               className={styles.templateCard}

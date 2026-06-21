@@ -14,25 +14,34 @@ import {
   getTotalExpense,
   getAveragePerPerson,
 } from '@/utils/aaCalculator';
-import { categoryLabels, ExpenseCategory } from '@/utils/format';
+import { categoryLabels } from '@/utils/format';
+import { ExpenseCategory } from '@/types';
 import styles from './index.module.scss';
 
 const ExpensePage: React.FC = () => {
-  const { trips, currentTripId } = useTripStore();
+  const { trips, currentTripId, fetchExpenses } = useTripStore();
   const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [refreshing, setRefreshing] = useState(false);
+  const [, setRefreshing] = useState(false);
 
   useDidShow(() => {
-    console.log('[Expense] 页面显示');
+    if (currentTripId) {
+      fetchExpenses(currentTripId).catch(() => {});
+    }
   });
 
   usePullDownRefresh(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
+    if (!currentTripId) {
       Taro.stopPullDownRefresh();
-      Taro.showToast({ title: '刷新成功', icon: 'success' });
-    }, 800);
+      return;
+    }
+    setRefreshing(true);
+    fetchExpenses(currentTripId)
+      .then(() => Taro.showToast({ title: '刷新成功', icon: 'success' }))
+      .catch(() => {})
+      .finally(() => {
+        setRefreshing(false);
+        Taro.stopPullDownRefresh();
+      });
   });
 
   const currentTrip = useMemo(

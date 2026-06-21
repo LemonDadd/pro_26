@@ -33,11 +33,13 @@ const categoryColors: Record<ExpenseCategory, string> = {
 };
 
 const StatsPage: React.FC = () => {
-  const { trips, currentTripId, currentUser } = useTripStore();
+  const { trips, currentTripId, currentUser, fetchExpenses } = useTripStore();
   const canvasRef = useRef<any>(null);
 
   useDidShow(() => {
-    console.log('[Stats] 页面显示');
+    if (currentTripId) {
+      fetchExpenses(currentTripId).catch(() => {});
+    }
   });
 
   const currentTrip = useMemo(

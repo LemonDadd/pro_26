@@ -73,7 +73,7 @@ const CreateTripPage: React.FC = () => {
     []
   );
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!title.trim()) {
       Taro.showToast({ title: '请输入行程名称', icon: 'none' });
       return;
@@ -89,40 +89,35 @@ const CreateTripPage: React.FC = () => {
 
     const template = tripTemplates.find((t) => t.id === selectedTemplateId);
 
-    if (isEditMode && tripId) {
-      updateTrip(tripId, {
-        title: title.trim(),
-        destination: destination.trim(),
-        startDate,
-        endDate,
-        templateId: selectedTemplateId || undefined,
-      });
-
-      Taro.showToast({ title: '保存成功', icon: 'success' });
-      setTimeout(() => {
-        Taro.navigateBack();
-      }, 1000);
-    } else {
-      addTrip({
-        title: title.trim(),
-        destination: destination.trim(),
-        startDate,
-        endDate,
-        leaderId: currentUser.id,
-        members: [currentUser],
-        days: template?.sampleDays?.map((d, i) => ({
-          ...d,
-          day: i + 1,
-          date: '',
-        })),
-        status: 'active',
-        templateId: selectedTemplateId || undefined,
-      });
-
-      Taro.showToast({ title: '创建成功', icon: 'success' });
-      setTimeout(() => {
-        Taro.switchTab({ url: '/pages/home/index' });
-      }, 1000);
+    try {
+      if (isEditMode && tripId) {
+        await updateTrip(tripId, {
+          title: title.trim(),
+          destination: destination.trim(),
+          startDate,
+          endDate,
+          templateId: selectedTemplateId || undefined,
+        });
+        Taro.showToast({ title: '保存成功', icon: 'success' });
+        setTimeout(() => Taro.navigateBack(), 1000);
+      } else {
+        await addTrip({
+          title: title.trim(),
+          destination: destination.trim(),
+          startDate,
+          endDate,
+          templateId: selectedTemplateId || undefined,
+          days: template?.sampleDays?.map((d, i) => ({
+            ...d,
+            day: i + 1,
+            date: '',
+          })),
+        });
+        Taro.showToast({ title: '创建成功', icon: 'success' });
+        setTimeout(() => Taro.switchTab({ url: '/pages/home/index' }), 1000);
+      }
+    } catch (e) {
+      // 错误已由请求层统一提示
     }
   }, [
     title,

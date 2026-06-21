@@ -19,9 +19,9 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     outputRoot: process.env.TARO_OUTPUT_DIR || 'dist',
     plugins: ['@tarojs/plugin-html'],
     defineConstants: {
-      BASE_URL: process.env.NODE_ENV === 'development'
+      BASE_URL: JSON.stringify(process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000/api/v1'
-        : 'https://api.example.com/api/v1',
+        : 'https://api.example.com/api/v1'),
     },
     copy: {
       patterns: [],

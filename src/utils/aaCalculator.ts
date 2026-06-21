@@ -48,7 +48,7 @@ export function calculateUserBalances(
 
 export function simplifyDebts(
   balances: UserBalance[],
-  members: User[]
+  _members: User[]
 ): SettlementItem[] {
   const debtors: { userId: string; amount: number }[] = [];
   const creditors: { userId: string; amount: number }[] = [];

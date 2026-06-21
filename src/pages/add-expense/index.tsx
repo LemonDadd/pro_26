@@ -21,7 +21,7 @@ import styles from './index.module.scss';
 
 const AddExpensePage: React.FC = () => {
   const router = useRouter();
-  const { trips, currentTripId, currentUser, addExpense, updateExpense, getExpenseById, setCurrentTrip } = useTripStore();
+  const { trips, currentTripId, currentUser, addExpense, updateExpense, getExpenseById } = useTripStore();
 
   const expenseId = router.params.expenseId;
   const isEditMode = !!expenseId;
@@ -152,7 +152,7 @@ const AddExpensePage: React.FC = () => {
     });
   }, []);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!currentTripId) {
       Taro.showToast({ title: '请先选择行程', icon: 'none' });
       return;
@@ -191,21 +191,20 @@ const AddExpensePage: React.FC = () => {
       exchangeRate: currency === 'CNY' ? 1 : rateNum,
     };
 
-    if (isEditMode && expenseId) {
-      updateExpense(currentTripId, expenseId, expenseData);
-      Taro.showToast({ title: '保存成功', icon: 'success' });
-    } else {
-      addExpense({
-        tripId: currentTripId,
-        ...expenseData,
-        createdBy: currentUser.id,
-      });
-      Taro.showToast({ title: '记账成功', icon: 'success' });
-    }
+    try {
+      if (isEditMode && expenseId) {
+        await updateExpense(currentTripId, expenseId, expenseData);
+        Taro.showToast({ title: '保存成功', icon: 'success' });
+      } else {
+        await addExpense(currentTripId, expenseData);
+        Taro.showToast({ title: '记账成功', icon: 'success' });
+      }
 
-    setTimeout(() => {
-      Taro.navigateBack();
-    }, 1000);
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } catch (err) {
+    }
   }, [
     currentTripId,
     amountNum,
@@ -223,7 +222,6 @@ const AddExpensePage: React.FC = () => {
     expenseId,
     updateExpense,
     addExpense,
-    currentUser.id,
   ]);
 
   const getCategoryBgClass = (cat: ExpenseCategory) => {
@@ -434,7 +432,7 @@ const AddExpensePage: React.FC = () => {
               placeholderClass={styles.inputPlaceholder}
               value={note}
               onInput={(e) => setNote(e.detail.value)}
-              maxLength={200}
+              maxlength={200}
               autoHeight
             />
           </View>
