@@ -16,7 +16,7 @@ import styles from './index.module.scss';
 
 const CreateTripPage: React.FC = () => {
   const router = useRouter();
-  const { addTrip, updateTrip, currentUser, trips, fetchTemplates } = useTripStore();
+  const { addTrip, updateTrip, currentUser, trips, fetchTemplates, applyTemplate } = useTripStore();
 
   const [title, setTitle] = useState('');
   const [destination, setDestination] = useState('');
@@ -97,8 +97,6 @@ const CreateTripPage: React.FC = () => {
       return;
     }
 
-    const template = templates.find((t) => t.id === selectedTemplateId);
-
     try {
       if (isEditMode && tripId) {
         await updateTrip(tripId, {
@@ -110,18 +108,21 @@ const CreateTripPage: React.FC = () => {
         });
         Taro.showToast({ title: '保存成功', icon: 'success' });
         setTimeout(() => Taro.navigateBack(), 1000);
+      } else if (selectedTemplateId) {
+        await applyTemplate(selectedTemplateId, {
+          title: title.trim(),
+          destination: destination.trim(),
+          startDate,
+          endDate,
+        });
+        Taro.showToast({ title: '创建成功', icon: 'success' });
+        setTimeout(() => Taro.switchTab({ url: '/pages/home/index' }), 1000);
       } else {
         await addTrip({
           title: title.trim(),
           destination: destination.trim(),
           startDate,
           endDate,
-          templateId: selectedTemplateId || undefined,
-          days: template?.sampleDays?.map((d, i) => ({
-            ...d,
-            day: i + 1,
-            date: '',
-          })),
         });
         Taro.showToast({ title: '创建成功', icon: 'success' });
         setTimeout(() => Taro.switchTab({ url: '/pages/home/index' }), 1000);
@@ -139,6 +140,7 @@ const CreateTripPage: React.FC = () => {
     tripId,
     updateTrip,
     addTrip,
+    applyTemplate,
     currentUser,
   ]);
 

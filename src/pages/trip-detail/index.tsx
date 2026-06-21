@@ -9,21 +9,25 @@ import {
   getDaysBetween,
   formatDate,
 } from '@/utils/format';
-import { getTotalExpense, getAveragePerPerson } from '@/utils/aaCalculator';
+import type { TripStats } from '@/types';
 import styles from './index.module.scss';
 
 const TripDetailPage: React.FC = () => {
   const router = useRouter();
-  const { trips, setCurrentTrip, fetchTripDetail, loading, generateInviteCode } = useTripStore();
+  const { trips, setCurrentTrip, fetchTripDetail, loading, generateInviteCode, fetchTripSummary } = useTripStore();
   const [loaded, setLoaded] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const [qrLoading, setQrLoading] = useState(false);
+  const [summary, setSummary] = useState<TripStats | null>(null);
 
   const tripId = router.params.id;
 
   useDidShow(() => {
     if (tripId) {
       fetchTripDetail(tripId).finally(() => setLoaded(true));
+      fetchTripSummary(tripId)
+        .then(setSummary)
+        .catch(() => {});
     }
   });
 
@@ -31,10 +35,8 @@ const TripDetailPage: React.FC = () => {
     return trips.find((t) => t.id === tripId);
   }, [trips, tripId]);
 
-  const totalExpense = trip ? getTotalExpense(trip.expenses || []) : 0;
-  const avgPerPerson = trip
-    ? getAveragePerPerson(trip.expenses || [], trip.members.length)
-    : 0;
+  const totalExpense = summary?.totalExpense ?? 0;
+  const avgPerPerson = summary?.avgPerPerson ?? 0;
   const days = trip ? getDaysBetween(trip.startDate, trip.endDate) : 0;
 
   const handleViewMembers = useCallback(() => {

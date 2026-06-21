@@ -12,7 +12,7 @@ import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
 import { categoryLabels, categoryEmojis } from '@/utils/format';
-import { ExpenseCategory, CategoryStat, MyBill } from '@/types';
+import { ExpenseCategory, CategoryStat, MyBill, TripStats } from '@/types';
 import styles from './index.module.scss';
 
 const categoryColors: Record<ExpenseCategory, string> = {
@@ -27,23 +27,23 @@ const categoryColors: Record<ExpenseCategory, string> = {
 };
 
 const StatsPage: React.FC = () => {
-  const { trips, currentTripId, currentUser, fetchExpenses, fetchCategoryStats, fetchMyBill } = useTripStore();
+  const { trips, currentTripId, currentUser, fetchExpenses, fetchCategoryStats, fetchMyBill, fetchTripSummary } = useTripStore();
   const canvasRef = useRef<any>(null);
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
   const [myBill, setMyBill] = useState<MyBill | null>(null);
-  const [totalExpense, setTotalExpense] = useState(0);
+  const [tripSummary, setTripSummary] = useState<TripStats | null>(null);
 
   useDidShow(() => {
     if (!currentTripId) return;
     fetchExpenses(currentTripId).catch(() => {});
     fetchCategoryStats(currentTripId)
-      .then((res) => {
-        setCategoryStats(res.categoryStats || []);
-        setTotalExpense(res.totalExpense || 0);
-      })
+      .then((res) => setCategoryStats(res.categoryStats || []))
       .catch(() => {});
     fetchMyBill(currentTripId)
       .then(setMyBill)
+      .catch(() => {});
+    fetchTripSummary(currentTripId)
+      .then(setTripSummary)
       .catch(() => {});
   });
 
@@ -52,14 +52,13 @@ const StatsPage: React.FC = () => {
     [trips, currentTripId]
   );
 
-  const members = currentTrip?.members || [];
-  const avgPerPerson = members.length > 0 ? totalExpense / members.length : 0;
+  const totalExpense = tripSummary?.totalExpense ?? 0;
+  const avgPerPerson = tripSummary?.avgPerPerson ?? 0;
+  const expenseCount = tripSummary?.expenseCount ?? 0;
 
   const myBalance = myBill
-    ? { paid: myBill.paid || 0, shouldPay: myBill.shouldPay || 0, balance: (myBill.paid || 0) - (myBill.shouldPay || 0) }
+    ? { paid: myBill.paid || 0, shouldPay: myBill.shouldPay || 0, balance: myBill.balance || 0 }
     : { paid: 0, shouldPay: 0, balance: 0 };
-
-  const expenseCount = currentTrip?.expenses?.length || 0;
 
   const getBalanceClass = (balance: number) => {
     if (balance > 0.01) return styles.positive;
@@ -159,7 +158,7 @@ const StatsPage: React.FC = () => {
           </View>
           <View className={styles.overviewGrid}>
             <View className={styles.overviewItem}>
-              <Text className={styles.overviewValue}>{members.length}</Text>
+              <Text className={styles.overviewValue}>{tripSummary?.memberCount ?? 0}</Text>
               <Text className={styles.overviewLabel}>参与人数</Text>
             </View>
             <View className={styles.overviewItem}>
