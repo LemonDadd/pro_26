@@ -6,16 +6,9 @@ import {
   calculateUserBalances,
   simplifyDebts,
   getTotalExpense,
+  toExpenseLike,
 } from '@/utils/aa-calculator';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
-
-interface ExpenseLike {
-  amount: number;
-  payerId: string;
-  splitType: string;
-  participants?: string[];
-  splits?: { userId: string; amount?: number | null; percentage?: number | null }[];
-}
 
 @Injectable()
 export class SettlementService {
@@ -24,26 +17,6 @@ export class SettlementService {
     private readonly activityService: ActivityService,
     private readonly configService: ConfigService,
   ) {}
-
-  private toExpenseLike(e: any): ExpenseLike {
-    return {
-      amount: e.amount,
-      payerId: e.payerId,
-      splitType: e.splitType,
-      participants:
-        e.splitType === 'equal' && e.splits
-          ? e.splits.map((s: any) => s.userId)
-          : undefined,
-      splits:
-        e.splitType !== 'equal' && e.splits
-          ? e.splits.map((s: any) => ({
-              userId: s.userId,
-              amount: s.amount,
-              percentage: s.percentage,
-            }))
-          : undefined,
-    };
-  }
 
   private makePlanId(
     tripId: string,
@@ -109,7 +82,7 @@ export class SettlementService {
     if (!trip) throwBiz(ErrorCodes.TRIP_NOT_FOUND);
 
     const memberIds = trip.members.map((m) => m.userId);
-    const expenses = trip.expenses.map((e) => this.toExpenseLike(e));
+    const expenses = trip.expenses.map((e) => toExpenseLike(e));
     const balances = calculateUserBalances(expenses, memberIds);
     const plan = simplifyDebts(balances);
 

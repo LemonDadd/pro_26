@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { JwtPayload } from '@/common/decorators/current-user.decorator';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
@@ -42,7 +43,7 @@ export class AuthService {
     return `wx_${code}`;
   }
 
-  async signTokens(userId: string, openid: string, user: any) {
+  async signTokens(userId: string, openid: string, user: User) {
     const payload: JwtPayload = { userId, openid };
     const token = await this.jwtService.signAsync(payload);
     const refreshToken = await this.jwtService.signAsync(payload, {

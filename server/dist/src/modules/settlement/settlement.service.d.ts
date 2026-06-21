@@ -6,7 +6,6 @@ export declare class SettlementService {
     private readonly activityService;
     private readonly configService;
     constructor(prisma: PrismaService, activityService: ActivityService, configService: ConfigService);
-    private toExpenseLike;
     private makePlanId;
     private parsePlanId;
     private ensureTripMember;

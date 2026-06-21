@@ -17,23 +17,6 @@ let StatsService = class StatsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    toExpenseLike(e) {
-        return {
-            amount: e.amount,
-            payerId: e.payerId,
-            splitType: e.splitType,
-            participants: e.splitType === 'equal' && e.splits
-                ? e.splits.map((s) => s.userId)
-                : undefined,
-            splits: e.splitType !== 'equal' && e.splits
-                ? e.splits.map((s) => ({
-                    userId: s.userId,
-                    amount: s.amount,
-                    percentage: s.percentage,
-                }))
-                : undefined,
-        };
-    }
     async personal(userId) {
         const memberships = await this.prisma.tripMember.findMany({
             where: { userId, status: 'active' },
@@ -82,7 +65,7 @@ let StatsService = class StatsService {
         if (!trip)
             return null;
         const memberIds = trip.members.map((m) => m.userId);
-        const expenses = trip.expenses.map((e) => this.toExpenseLike(e));
+        const expenses = trip.expenses.map((e) => (0, aa_calculator_1.toExpenseLike)(e));
         const balances = (0, aa_calculator_1.calculateUserBalances)(expenses, memberIds);
         const mine = balances.find((b) => b.userId === userId);
         const paidExpenses = trip.expenses

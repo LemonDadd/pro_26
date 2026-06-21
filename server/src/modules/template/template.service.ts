@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { TripTemplate } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
-import { generateInviteCode } from '@/utils/aa-calculator';
+import { generateUniqueInviteCode } from '@/utils/invite-code';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
 import { ApplyTemplateDto } from '@/modules/trip/dto/trip.dto';
+
+export interface SampleDay {
+  day: number;
+  destination: string;
+  description?: string;
+}
 
 @Injectable()
 export class TemplateService {
@@ -46,7 +53,9 @@ export class TemplateService {
     const tpl = await this.prisma.tripTemplate.findUnique({ where: { id } });
     if (!tpl) throwBiz(ErrorCodes.NOT_FOUND, '模板不存在');
 
-    const sampleDays: any[] = tpl.sampleDays ? JSON.parse(tpl.sampleDays) : [];
+    const sampleDays: SampleDay[] = tpl.sampleDays
+      ? JSON.parse(tpl.sampleDays)
+      : [];
     const title = dto.title || `${tpl.name}之旅`;
 
     const trip = await this.prisma.trip.create({
@@ -57,11 +66,11 @@ export class TemplateService {
         endDate: new Date(dto.endDate),
         leaderId: userId,
         templateId: tpl.id,
-        inviteCode: generateInviteCode(),
+        inviteCode: await generateUniqueInviteCode(this.prisma),
         members: { create: { userId, role: 'leader', status: 'active' } },
         dayPlans: sampleDays.length
           ? {
-              create: sampleDays.map((d: any) => ({
+              create: sampleDays.map((d) => ({
                 day: d.day,
                 destination: d.destination,
                 description: d.description,
@@ -75,7 +84,7 @@ export class TemplateService {
     return { tripId: trip.id, title: trip.title };
   }
 
-  private format(t: any) {
+  private format(t: TripTemplate) {
     return {
       id: t.id,
       name: t.name,
@@ -83,9 +92,9 @@ export class TemplateService {
       cover: t.cover,
       estimatedDays: t.estimatedDays,
       estimatedBudget: t.estimatedBudget,
-      categories: t.categories ? JSON.parse(t.categories) : [],
-      tags: t.tags ? JSON.parse(t.tags) : [],
-      sampleDays: t.sampleDays ? JSON.parse(t.sampleDays) : [],
+      categories: t.categories ? (JSON.parse(t.categories) as string[]) : [],
+      tags: t.tags ? (JSON.parse(t.tags) as string[]) : [],
+      sampleDays: t.sampleDays ? (JSON.parse(t.sampleDays) as SampleDay[]) : [],
       isPublic: t.isPublic,
     };
   }

@@ -13,7 +13,7 @@ exports.TemplateService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const activity_service_1 = require("../activity/activity.service");
-const aa_calculator_1 = require("../../utils/aa-calculator");
+const invite_code_1 = require("../../utils/invite-code");
 const business_exception_1 = require("../../common/exceptions/business.exception");
 let TemplateService = class TemplateService {
     constructor(prisma, activityService) {
@@ -52,7 +52,9 @@ let TemplateService = class TemplateService {
         const tpl = await this.prisma.tripTemplate.findUnique({ where: { id } });
         if (!tpl)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.NOT_FOUND, '模板不存在');
-        const sampleDays = tpl.sampleDays ? JSON.parse(tpl.sampleDays) : [];
+        const sampleDays = tpl.sampleDays
+            ? JSON.parse(tpl.sampleDays)
+            : [];
         const title = dto.title || `${tpl.name}之旅`;
         const trip = await this.prisma.trip.create({
             data: {
@@ -62,7 +64,7 @@ let TemplateService = class TemplateService {
                 endDate: new Date(dto.endDate),
                 leaderId: userId,
                 templateId: tpl.id,
-                inviteCode: (0, aa_calculator_1.generateInviteCode)(),
+                inviteCode: await (0, invite_code_1.generateUniqueInviteCode)(this.prisma),
                 members: { create: { userId, role: 'leader', status: 'active' } },
                 dayPlans: sampleDays.length
                     ? {

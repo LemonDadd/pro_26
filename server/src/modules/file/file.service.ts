@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class FileService {
     }
   }
 
-  buildUrl(file: Express.Multer.File, req: any): string {
+  buildUrl(file: Express.Multer.File, req: Request): string {
     const port = this.configService.get<number>('PORT', 3000);
     const host = req?.headers?.host || `localhost:${port}`;
     return `http://${host}/uploads/${file.filename}`;

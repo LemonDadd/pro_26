@@ -11,6 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { Request } from 'express';
 import { FileService } from './file.service';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
@@ -35,7 +36,7 @@ export class FileController {
   @Post('upload')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file', { storage }))
-  async upload(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
+  async upload(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
     this.fileService.validate(file);
     const url = this.fileService.buildUrl(file, req);
     return {

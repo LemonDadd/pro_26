@@ -5,12 +5,23 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { PrismaService } from '@/prisma/prisma.service';
+import { JwtPayload } from '@/common/decorators/current-user.decorator';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
+import { Trip } from '@prisma/client';
 
 export const TRIP_ACCESS_KEY = 'tripAccess';
+export const TRIP_ID_PARAM_KEY = 'tripIdParam';
 export const RequireLeader = (requireLeader = true) =>
   SetMetadata(TRIP_ACCESS_KEY, { requireLeader });
+export const TripIdParam = (paramName: string) =>
+  SetMetadata(TRIP_ID_PARAM_KEY, paramName);
+
+interface TripAccessRequest extends Request {
+  user?: JwtPayload;
+  trip?: Trip;
+}
 
 @Injectable()
 export class TripAccessGuard implements CanActivate {
@@ -20,14 +31,17 @@ export class TripAccessGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const tripId = req.params.tripId;
-    const user = req.user as { userId: string } | undefined;
+    const req = context.switchToHttp().getRequest<TripAccessRequest>();
+    const user = req.user;
 
-    const config = this.reflector.get<{ requireLeader?: boolean }>(
+    const accessConfig = this.reflector.get<{ requireLeader?: boolean }>(
       TRIP_ACCESS_KEY,
       context.getHandler(),
     );
+    const tripIdParamName =
+      this.reflector.get<string>(TRIP_ID_PARAM_KEY, context.getHandler()) ??
+      'tripId';
+    const tripId = req.params?.[tripIdParamName];
 
     if (!tripId || !user) {
       return true;
@@ -44,7 +58,7 @@ export class TripAccessGuard implements CanActivate {
       throwBiz(ErrorCodes.FORBIDDEN, '您不是该行程的成员');
     }
 
-    if (config?.requireLeader && trip.leaderId !== user.userId) {
+    if (accessConfig?.requireLeader && trip.leaderId !== user.userId) {
       throwBiz(ErrorCodes.FORBIDDEN, '需要队长权限');
     }
 

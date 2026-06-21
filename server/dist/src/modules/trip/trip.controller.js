@@ -18,7 +18,6 @@ const trip_service_1 = require("./trip.service");
 const trip_dto_1 = require("./dto/trip.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const trip_access_guard_1 = require("../../common/guards/trip-access.guard");
-const trip_access_guard_2 = require("../../common/guards/trip-access.guard");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 let TripController = class TripController {
     constructor(tripService) {
@@ -67,6 +66,7 @@ __decorate([
 ], TripController.prototype, "list", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, trip_access_guard_1.TripIdParam)('id'),
     (0, common_1.UseGuards)(trip_access_guard_1.TripAccessGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -75,8 +75,9 @@ __decorate([
 ], TripController.prototype, "detail", null);
 __decorate([
     (0, common_1.Put)(':id'),
+    (0, trip_access_guard_1.TripIdParam)('id'),
     (0, common_1.UseGuards)(trip_access_guard_1.TripAccessGuard),
-    (0, trip_access_guard_2.RequireLeader)(),
+    (0, trip_access_guard_1.RequireLeader)(),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -85,8 +86,9 @@ __decorate([
 ], TripController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, trip_access_guard_1.TripIdParam)('id'),
     (0, common_1.UseGuards)(trip_access_guard_1.TripAccessGuard),
-    (0, trip_access_guard_2.RequireLeader)(),
+    (0, trip_access_guard_1.RequireLeader)(),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -94,8 +96,9 @@ __decorate([
 ], TripController.prototype, "remove", null);
 __decorate([
     (0, common_1.Post)(':id/complete'),
+    (0, trip_access_guard_1.TripIdParam)('id'),
     (0, common_1.UseGuards)(trip_access_guard_1.TripAccessGuard),
-    (0, trip_access_guard_2.RequireLeader)(),
+    (0, trip_access_guard_1.RequireLeader)(),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -103,6 +106,7 @@ __decorate([
 ], TripController.prototype, "complete", null);
 __decorate([
     (0, common_1.Get)(':id/summary'),
+    (0, trip_access_guard_1.TripIdParam)('id'),
     (0, common_1.UseGuards)(trip_access_guard_1.TripAccessGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

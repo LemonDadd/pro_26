@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Trip, TripMember, TripDayPlan } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
-import { generateInviteCode } from '@/utils/aa-calculator';
+import { generateUniqueInviteCode } from '@/utils/invite-code';
 import {
   getTotalExpense,
   getAveragePerPerson,
@@ -9,6 +10,16 @@ import {
 } from '@/utils/aa-calculator';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
 import { CreateTripDto, UpdateTripDto } from './dto/trip.dto';
+
+type UserRef = { id: string; nickname: string; avatar: string | null };
+type TripMemberWithUser = TripMember & { user: UserRef };
+
+interface TripWithRelations extends Trip {
+  leader: UserRef;
+  members: TripMemberWithUser[];
+  dayPlans?: TripDayPlan[];
+  expenses: { amount: number }[];
+}
 
 @Injectable()
 export class TripService {
@@ -18,6 +29,7 @@ export class TripService {
   ) {}
 
   async create(userId: string, dto: CreateTripDto) {
+    const inviteCode = await generateUniqueInviteCode(this.prisma);
     const trip = await this.prisma.trip.create({
       data: {
         title: dto.title,
@@ -26,7 +38,7 @@ export class TripService {
         endDate: new Date(dto.endDate),
         leaderId: userId,
         templateId: dto.templateId,
-        inviteCode: this.uniqueInviteCode(),
+        inviteCode,
         members: {
           create: { userId, role: 'leader', status: 'active' },
         },
@@ -46,11 +58,6 @@ export class TripService {
 
     await this.activityService.add(trip.id, userId, 'member_join', '创建了行程');
     return this.formatTrip(trip);
-  }
-
-  private uniqueInviteCode(): string {
-    let code = generateInviteCode();
-    return code;
   }
 
   async list(userId: string, status?: string, page = 1, pageSize = 20) {
@@ -177,12 +184,12 @@ export class TripService {
     } as const;
   }
 
-  private stripRelations(trip: any) {
-    const { members, expenses, leader, dayPlans, ...rest } = trip;
+  private stripRelations(trip: TripWithRelations) {
+    const { members, expenses, leader, ...rest } = trip;
     return rest;
   }
 
-  private formatTrip(trip: any) {
+  private formatTrip(trip: TripWithRelations) {
     const expenses = trip.expenses ?? [];
     return {
       id: trip.id,
@@ -197,14 +204,14 @@ export class TripService {
       createdAt: trip.createdAt,
       updatedAt: trip.updatedAt,
       leader: trip.leader,
-      members: (trip.members ?? []).map((m: any) => ({
+      members: (trip.members ?? []).map((m) => ({
         id: m.user.id,
         nickname: m.user.nickname,
         avatar: m.user.avatar,
         role: m.role,
         joinedAt: m.joinedAt,
       })),
-      days: (trip.dayPlans ?? []).map((d: any) => ({
+      days: (trip.dayPlans ?? []).map((d) => ({
         id: d.id,
         day: d.day,
         date: d.date,

@@ -1,5 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 export declare class AuthService {
     private readonly prisma;
@@ -11,20 +12,20 @@ export declare class AuthService {
         refreshToken: string;
         expiresIn: number;
         user: {
-            id: any;
-            nickname: any;
-            avatar: any;
+            id: string;
+            nickname: string;
+            avatar: string | null;
         };
     }>;
     private resolveOpenid;
-    signTokens(userId: string, openid: string, user: any): Promise<{
+    signTokens(userId: string, openid: string, user: User): Promise<{
         token: string;
         refreshToken: string;
         expiresIn: number;
         user: {
-            id: any;
-            nickname: any;
-            avatar: any;
+            id: string;
+            nickname: string;
+            avatar: string | null;
         };
     }>;
     refresh(refreshToken: string): Promise<{
@@ -32,9 +33,9 @@ export declare class AuthService {
         refreshToken: string;
         expiresIn: number;
         user: {
-            id: any;
-            nickname: any;
-            avatar: any;
+            id: string;
+            nickname: string;
+            avatar: string | null;
         };
     }>;
     getCurrentUser(userId: string): Promise<{

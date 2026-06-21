@@ -1,6 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
 import { CreateVehicleDto, UpdateVehicleDto, CreateFuelSubsidyDto } from './dto/vehicle.dto';
+type UserRef = {
+    id: string;
+    nickname: string;
+    avatar: string | null;
+};
 export declare class VehicleService {
     private readonly prisma;
     private readonly activityService;
@@ -8,54 +13,54 @@ export declare class VehicleService {
     list(tripId: string): Promise<{
         list: {
             fuelCost: number;
-            id: any;
-            tripId: any;
-            plateNumber: any;
-            model: any;
-            capacity: any;
-            fuelConsumption: any;
-            ownerId: any;
-            owner: any;
-            createdAt: any;
-            updatedAt: any;
+            id: string;
+            tripId: string;
+            plateNumber: string | null;
+            model: string;
+            capacity: number;
+            fuelConsumption: number | null;
+            ownerId: string;
+            owner: UserRef;
+            createdAt: Date;
+            updatedAt: Date;
         }[];
         total: number;
     }>;
     detail(id: string): Promise<{
-        id: any;
-        tripId: any;
-        plateNumber: any;
-        model: any;
-        capacity: any;
-        fuelConsumption: any;
-        ownerId: any;
-        owner: any;
-        createdAt: any;
-        updatedAt: any;
+        id: string;
+        tripId: string;
+        plateNumber: string | null;
+        model: string;
+        capacity: number;
+        fuelConsumption: number | null;
+        ownerId: string;
+        owner: UserRef;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     create(tripId: string, dto: CreateVehicleDto): Promise<{
-        id: any;
-        tripId: any;
-        plateNumber: any;
-        model: any;
-        capacity: any;
-        fuelConsumption: any;
-        ownerId: any;
-        owner: any;
-        createdAt: any;
-        updatedAt: any;
+        id: string;
+        tripId: string;
+        plateNumber: string | null;
+        model: string;
+        capacity: number;
+        fuelConsumption: number | null;
+        ownerId: string;
+        owner: UserRef;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     update(id: string, dto: UpdateVehicleDto): Promise<{
-        id: any;
-        tripId: any;
-        plateNumber: any;
-        model: any;
-        capacity: any;
-        fuelConsumption: any;
-        ownerId: any;
-        owner: any;
-        createdAt: any;
-        updatedAt: any;
+        id: string;
+        tripId: string;
+        plateNumber: string | null;
+        model: string;
+        capacity: number;
+        fuelConsumption: number | null;
+        ownerId: string;
+        owner: UserRef;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -89,3 +94,4 @@ export declare class VehicleService {
     }>;
     private formatVehicle;
 }
+export {};

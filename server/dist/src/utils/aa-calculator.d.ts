@@ -1,3 +1,4 @@
+import { Expense, ExpenseSplit } from '@prisma/client';
 export interface UserBalance {
     userId: string;
     paid: number;
@@ -19,7 +20,7 @@ export interface SplitItem {
     amount?: number;
     percentage?: number;
 }
-interface ExpenseLike {
+export interface ExpenseLike {
     amount: number;
     payerId: string;
     splitType: string;
@@ -31,6 +32,10 @@ interface ExpenseLike {
         percentage?: number | null;
     }[];
 }
+export type ExpenseWithSplits = Expense & {
+    splits: ExpenseSplit[];
+};
+export declare function toExpenseLike(e: ExpenseWithSplits): ExpenseLike;
 export declare function calculateUserBalances(expenses: ExpenseLike[], memberIds: string[]): UserBalance[];
 export declare function simplifyDebts(balances: UserBalance[]): SettlementItem[];
 export declare function getTotalExpense(expenses: {
@@ -44,4 +49,3 @@ export declare function getCategoryStats(expenses: {
     category: string;
 }[]): CategoryStat[];
 export declare function generateInviteCode(): string;
-export {};

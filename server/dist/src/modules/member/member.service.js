@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const activity_service_1 = require("../activity/activity.service");
 const aa_calculator_1 = require("../../utils/aa-calculator");
-const aa_calculator_2 = require("../../utils/aa-calculator");
+const invite_code_1 = require("../../utils/invite-code");
 const business_exception_1 = require("../../common/exceptions/business.exception");
 let MemberService = class MemberService {
     constructor(prisma, activityService) {
@@ -28,10 +28,11 @@ let MemberService = class MemberService {
         });
         const trip = await this.prisma.trip.findUnique({
             where: { id: tripId },
-            include: { expenses: true },
+            include: { expenses: { include: { splits: true } } },
         });
         const memberIds = memberships.map((m) => m.userId);
-        const balances = (0, aa_calculator_1.calculateUserBalances)(trip?.expenses ?? [], memberIds);
+        const expenses = (trip?.expenses ?? []).map((e) => (0, aa_calculator_1.toExpenseLike)(e));
+        const balances = (0, aa_calculator_1.calculateUserBalances)(expenses, memberIds);
         return {
             list: memberships.map((m) => {
                 const b = balances.find((x) => x.userId === m.userId);
@@ -86,7 +87,7 @@ let MemberService = class MemberService {
         const trip = await this.prisma.trip.findUnique({ where: { id: tripId } });
         if (!trip)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.TRIP_NOT_FOUND);
-        const code = (0, aa_calculator_2.generateInviteCode)();
+        const code = await (0, invite_code_1.generateUniqueInviteCode)(this.prisma);
         const updated = await this.prisma.trip.update({
             where: { id: tripId },
             data: { inviteCode: code },

@@ -1,11 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.toExpenseLike = toExpenseLike;
 exports.calculateUserBalances = calculateUserBalances;
 exports.simplifyDebts = simplifyDebts;
 exports.getTotalExpense = getTotalExpense;
 exports.getAveragePerPerson = getAveragePerPerson;
 exports.getCategoryStats = getCategoryStats;
 exports.generateInviteCode = generateInviteCode;
+function toExpenseLike(e) {
+    return {
+        amount: e.amount,
+        payerId: e.payerId,
+        splitType: e.splitType,
+        category: e.category,
+        participants: e.splitType === 'equal' && e.splits
+            ? e.splits.map((s) => s.userId)
+            : undefined,
+        splits: e.splitType !== 'equal' && e.splits
+            ? e.splits.map((s) => ({
+                userId: s.userId,
+                amount: s.amount,
+                percentage: s.percentage,
+            }))
+            : undefined,
+    };
+}
 const round2 = (n) => Number(n.toFixed(2));
 function calculateUserBalances(expenses, memberIds) {
     const balances = {};

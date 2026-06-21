@@ -22,23 +22,6 @@ let SettlementService = class SettlementService {
         this.activityService = activityService;
         this.configService = configService;
     }
-    toExpenseLike(e) {
-        return {
-            amount: e.amount,
-            payerId: e.payerId,
-            splitType: e.splitType,
-            participants: e.splitType === 'equal' && e.splits
-                ? e.splits.map((s) => s.userId)
-                : undefined,
-            splits: e.splitType !== 'equal' && e.splits
-                ? e.splits.map((s) => ({
-                    userId: s.userId,
-                    amount: s.amount,
-                    percentage: s.percentage,
-                }))
-                : undefined,
-        };
-    }
     makePlanId(tripId, index, fromUserId, toUserId, amount) {
         return `plan:${tripId}:${index}:${fromUserId}-${toUserId}-${amount}`;
     }
@@ -90,7 +73,7 @@ let SettlementService = class SettlementService {
         if (!trip)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.TRIP_NOT_FOUND);
         const memberIds = trip.members.map((m) => m.userId);
-        const expenses = trip.expenses.map((e) => this.toExpenseLike(e));
+        const expenses = trip.expenses.map((e) => (0, aa_calculator_1.toExpenseLike)(e));
         const balances = (0, aa_calculator_1.calculateUserBalances)(expenses, memberIds);
         const plan = (0, aa_calculator_1.simplifyDebts)(balances);
         const settledRecords = await this.prisma.settlement.findMany({

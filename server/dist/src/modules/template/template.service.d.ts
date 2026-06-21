@@ -1,6 +1,11 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
 import { ApplyTemplateDto } from '@/modules/trip/dto/trip.dto';
+export interface SampleDay {
+    day: number;
+    destination: string;
+    description?: string;
+}
 export declare class TemplateService {
     private readonly prisma;
     private readonly activityService;
@@ -12,16 +17,16 @@ export declare class TemplateService {
         pageSize: number;
     }): Promise<{
         list: {
-            id: any;
-            name: any;
-            description: any;
-            cover: any;
-            estimatedDays: any;
-            estimatedBudget: any;
-            categories: any;
-            tags: any;
-            sampleDays: any;
-            isPublic: any;
+            id: string;
+            name: string;
+            description: string | null;
+            cover: string | null;
+            estimatedDays: number;
+            estimatedBudget: number | null;
+            categories: string[];
+            tags: string[];
+            sampleDays: SampleDay[];
+            isPublic: boolean;
         }[];
         total: number;
         page: number;
@@ -29,16 +34,16 @@ export declare class TemplateService {
         hasMore: boolean;
     }>;
     detail(id: string): Promise<{
-        id: any;
-        name: any;
-        description: any;
-        cover: any;
-        estimatedDays: any;
-        estimatedBudget: any;
-        categories: any;
-        tags: any;
-        sampleDays: any;
-        isPublic: any;
+        id: string;
+        name: string;
+        description: string | null;
+        cover: string | null;
+        estimatedDays: number;
+        estimatedBudget: number | null;
+        categories: string[];
+        tags: string[];
+        sampleDays: SampleDay[];
+        isPublic: boolean;
     }>;
     apply(id: string, userId: string, dto: ApplyTemplateDto): Promise<{
         tripId: string;

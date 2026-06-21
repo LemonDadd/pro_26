@@ -13,8 +13,8 @@ exports.TripService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const activity_service_1 = require("../activity/activity.service");
+const invite_code_1 = require("../../utils/invite-code");
 const aa_calculator_1 = require("../../utils/aa-calculator");
-const aa_calculator_2 = require("../../utils/aa-calculator");
 const business_exception_1 = require("../../common/exceptions/business.exception");
 let TripService = class TripService {
     constructor(prisma, activityService) {
@@ -22,6 +22,7 @@ let TripService = class TripService {
         this.activityService = activityService;
     }
     async create(userId, dto) {
+        const inviteCode = await (0, invite_code_1.generateUniqueInviteCode)(this.prisma);
         const trip = await this.prisma.trip.create({
             data: {
                 title: dto.title,
@@ -30,7 +31,7 @@ let TripService = class TripService {
                 endDate: new Date(dto.endDate),
                 leaderId: userId,
                 templateId: dto.templateId,
-                inviteCode: this.uniqueInviteCode(),
+                inviteCode,
                 members: {
                     create: { userId, role: 'leader', status: 'active' },
                 },
@@ -49,10 +50,6 @@ let TripService = class TripService {
         });
         await this.activityService.add(trip.id, userId, 'member_join', '创建了行程');
         return this.formatTrip(trip);
-    }
-    uniqueInviteCode() {
-        let code = (0, aa_calculator_1.generateInviteCode)();
-        return code;
     }
     async list(userId, status, page = 1, pageSize = 20) {
         const where = {
@@ -78,7 +75,7 @@ let TripService = class TripService {
         return {
             list: list.map((t) => ({
                 ...this.stripRelations(t),
-                totalExpense: (0, aa_calculator_2.getTotalExpense)(t.expenses),
+                totalExpense: (0, aa_calculator_1.getTotalExpense)(t.expenses),
             })),
             total,
             page,
@@ -154,11 +151,11 @@ let TripService = class TripService {
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.TRIP_NOT_FOUND);
         const memberIds = trip.members.map((m) => m.userId);
         return {
-            totalExpense: (0, aa_calculator_2.getTotalExpense)(trip.expenses),
-            avgPerPerson: (0, aa_calculator_2.getAveragePerPerson)(trip.expenses, memberIds.length),
+            totalExpense: (0, aa_calculator_1.getTotalExpense)(trip.expenses),
+            avgPerPerson: (0, aa_calculator_1.getAveragePerPerson)(trip.expenses, memberIds.length),
             expenseCount: trip.expenses.length,
             memberCount: memberIds.length,
-            categoryStats: (0, aa_calculator_2.getCategoryStats)(trip.expenses),
+            categoryStats: (0, aa_calculator_1.getCategoryStats)(trip.expenses),
         };
     }
     detailInclude() {
@@ -173,7 +170,7 @@ let TripService = class TripService {
         };
     }
     stripRelations(trip) {
-        const { members, expenses, leader, dayPlans, ...rest } = trip;
+        const { members, expenses, leader, ...rest } = trip;
         return rest;
     }
     formatTrip(trip) {
@@ -206,7 +203,7 @@ let TripService = class TripService {
                 description: d.description,
             })),
             stats: {
-                totalExpense: (0, aa_calculator_2.getTotalExpense)(expenses),
+                totalExpense: (0, aa_calculator_1.getTotalExpense)(expenses),
                 expenseCount: expenses.length,
                 memberCount: trip.members?.length ?? 0,
             },

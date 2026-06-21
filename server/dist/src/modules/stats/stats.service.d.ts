@@ -2,7 +2,6 @@ import { PrismaService } from '@/prisma/prisma.service';
 export declare class StatsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    private toExpenseLike;
     personal(userId: string): Promise<{
         totalTrips: number;
         totalExpense: number;

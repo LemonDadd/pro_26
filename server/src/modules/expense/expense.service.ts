@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Expense, ExpenseSplit } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
@@ -10,6 +11,12 @@ import {
 } from './dto/expense.dto';
 
 const round2 = (n: number) => Number(n.toFixed(2));
+
+type UserRef = { id: string; nickname: string; avatar: string | null };
+interface ExpenseDetail extends Expense {
+  payer: UserRef;
+  splits: (ExpenseSplit & { user: UserRef })[];
+}
 
 @Injectable()
 export class ExpenseService {
@@ -227,7 +234,7 @@ export class ExpenseService {
     } as const;
   }
 
-  private formatExpense(e: any) {
+  private formatExpense(e: ExpenseDetail) {
     return {
       id: e.id,
       tripId: e.tripId,
@@ -245,7 +252,7 @@ export class ExpenseService {
       createdAt: e.createdAt,
       updatedAt: e.updatedAt,
       payer: e.payer,
-      participants: (e.splits ?? []).map((s: any) => ({
+      participants: (e.splits ?? []).map((s) => ({
         id: s.userId,
         nickname: s.user?.nickname,
         avatar: s.user?.avatar,

@@ -11,10 +11,10 @@ export declare class ActivityController {
                 nickname: string;
                 avatar: string | null;
             };
+            userId: string;
             id: string;
             createdAt: Date;
             tripId: string;
-            userId: string;
             type: string;
             content: string;
         }[];

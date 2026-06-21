@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Vehicle } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
@@ -9,6 +10,11 @@ import {
 } from './dto/vehicle.dto';
 
 const round2 = (n: number) => Number(n.toFixed(2));
+
+type UserRef = { id: string; nickname: string; avatar: string | null };
+interface VehicleWithOwner extends Vehicle {
+  owner: UserRef;
+}
 
 @Injectable()
 export class VehicleService {
@@ -162,7 +168,7 @@ export class VehicleService {
     return { list, total: list.length };
   }
 
-  private formatVehicle(v: any) {
+  private formatVehicle(v: VehicleWithOwner) {
     return {
       id: v.id,
       tripId: v.tripId,

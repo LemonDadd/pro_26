@@ -1,4 +1,4 @@
-import { Expense } from '@prisma/client';
+import { Expense, ExpenseSplit } from '@prisma/client';
 
 export interface UserBalance {
   userId: string;
@@ -25,13 +25,36 @@ export interface SplitItem {
   percentage?: number;
 }
 
-interface ExpenseLike {
+export interface ExpenseLike {
   amount: number;
   payerId: string;
   splitType: string;
   category?: string;
   participants?: string[];
   splits?: { userId: string; amount?: number | null; percentage?: number | null }[];
+}
+
+export type ExpenseWithSplits = Expense & { splits: ExpenseSplit[] };
+
+export function toExpenseLike(e: ExpenseWithSplits): ExpenseLike {
+  return {
+    amount: e.amount,
+    payerId: e.payerId,
+    splitType: e.splitType,
+    category: e.category,
+    participants:
+      e.splitType === 'equal' && e.splits
+        ? e.splits.map((s) => s.userId)
+        : undefined,
+    splits:
+      e.splitType !== 'equal' && e.splits
+        ? e.splits.map((s) => ({
+            userId: s.userId,
+            amount: s.amount,
+            percentage: s.percentage,
+          }))
+        : undefined,
+  };
 }
 
 const round2 = (n: number) => Number(n.toFixed(2));

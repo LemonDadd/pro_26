@@ -5,73 +5,135 @@ export declare class TripController {
     private readonly tripService;
     constructor(tripService: TripService);
     create(user: JwtPayload, dto: CreateTripDto): Promise<{
-        id: any;
-        title: any;
-        destination: any;
-        startDate: any;
-        endDate: any;
-        leaderId: any;
-        status: any;
-        templateId: any;
-        inviteCode: any;
-        createdAt: any;
-        updatedAt: any;
-        leader: any;
-        members: any;
-        days: any;
+        id: string;
+        title: string;
+        destination: string;
+        startDate: Date;
+        endDate: Date;
+        leaderId: string;
+        status: string;
+        templateId: string | null;
+        inviteCode: string;
+        createdAt: Date;
+        updatedAt: Date;
+        leader: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+        };
+        members: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+            role: string;
+            joinedAt: Date;
+        }[];
+        days: {
+            id: string;
+            day: number;
+            date: Date | null;
+            destination: string;
+            description: string | null;
+        }[];
         stats: {
             totalExpense: number;
-            expenseCount: any;
-            memberCount: any;
+            expenseCount: number;
+            memberCount: number;
         };
     }>;
     list(user: JwtPayload, status?: string, page?: string, pageSize?: string): Promise<{
-        list: any[];
+        list: {
+            totalExpense: number;
+            dayPlans?: import(".prisma/client").TripDayPlan[];
+            id: string;
+            title: string;
+            destination: string;
+            startDate: Date;
+            endDate: Date;
+            leaderId: string;
+            status: string;
+            templateId: string | null;
+            inviteCode: string;
+            createdAt: Date;
+            updatedAt: Date;
+        }[];
         total: number;
         page: number;
         pageSize: number;
         hasMore: boolean;
     }>;
     detail(id: string): Promise<{
-        id: any;
-        title: any;
-        destination: any;
-        startDate: any;
-        endDate: any;
-        leaderId: any;
-        status: any;
-        templateId: any;
-        inviteCode: any;
-        createdAt: any;
-        updatedAt: any;
-        leader: any;
-        members: any;
-        days: any;
+        id: string;
+        title: string;
+        destination: string;
+        startDate: Date;
+        endDate: Date;
+        leaderId: string;
+        status: string;
+        templateId: string | null;
+        inviteCode: string;
+        createdAt: Date;
+        updatedAt: Date;
+        leader: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+        };
+        members: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+            role: string;
+            joinedAt: Date;
+        }[];
+        days: {
+            id: string;
+            day: number;
+            date: Date | null;
+            destination: string;
+            description: string | null;
+        }[];
         stats: {
             totalExpense: number;
-            expenseCount: any;
-            memberCount: any;
+            expenseCount: number;
+            memberCount: number;
         };
     }>;
     update(id: string, dto: UpdateTripDto): Promise<{
-        id: any;
-        title: any;
-        destination: any;
-        startDate: any;
-        endDate: any;
-        leaderId: any;
-        status: any;
-        templateId: any;
-        inviteCode: any;
-        createdAt: any;
-        updatedAt: any;
-        leader: any;
-        members: any;
-        days: any;
+        id: string;
+        title: string;
+        destination: string;
+        startDate: Date;
+        endDate: Date;
+        leaderId: string;
+        status: string;
+        templateId: string | null;
+        inviteCode: string;
+        createdAt: Date;
+        updatedAt: Date;
+        leader: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+        };
+        members: {
+            id: string;
+            nickname: string;
+            avatar: string | null;
+            role: string;
+            joinedAt: Date;
+        }[];
+        days: {
+            id: string;
+            day: number;
+            date: Date | null;
+            destination: string;
+            description: string | null;
+        }[];
         stats: {
             totalExpense: number;
-            expenseCount: any;
-            memberCount: any;
+            expenseCount: number;
+            memberCount: number;
         };
     }>;
     remove(id: string): Promise<{

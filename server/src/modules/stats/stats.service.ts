@@ -5,39 +5,12 @@ import {
   getAveragePerPerson,
   getCategoryStats,
   calculateUserBalances,
+  toExpenseLike,
 } from '@/utils/aa-calculator';
-
-interface ExpenseLike {
-  amount: number;
-  payerId: string;
-  splitType: string;
-  participants?: string[];
-  splits?: { userId: string; amount?: number | null; percentage?: number | null }[];
-}
 
 @Injectable()
 export class StatsService {
   constructor(private readonly prisma: PrismaService) {}
-
-  private toExpenseLike(e: any): ExpenseLike {
-    return {
-      amount: e.amount,
-      payerId: e.payerId,
-      splitType: e.splitType,
-      participants:
-        e.splitType === 'equal' && e.splits
-          ? e.splits.map((s: any) => s.userId)
-          : undefined,
-      splits:
-        e.splitType !== 'equal' && e.splits
-          ? e.splits.map((s: any) => ({
-              userId: s.userId,
-              amount: s.amount,
-              percentage: s.percentage,
-            }))
-          : undefined,
-    };
-  }
 
   async personal(userId: string) {
     const memberships = await this.prisma.tripMember.findMany({
@@ -93,7 +66,7 @@ export class StatsService {
     });
     if (!trip) return null;
     const memberIds = trip.members.map((m) => m.userId);
-    const expenses = trip.expenses.map((e) => this.toExpenseLike(e));
+    const expenses = trip.expenses.map((e) => toExpenseLike(e));
     const balances = calculateUserBalances(expenses, memberIds);
     const mine = balances.find((b) => b.userId === userId);
     const paidExpenses = trip.expenses

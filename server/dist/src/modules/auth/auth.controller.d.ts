@@ -9,9 +9,9 @@ export declare class AuthController {
         refreshToken: string;
         expiresIn: number;
         user: {
-            id: any;
-            nickname: any;
-            avatar: any;
+            id: string;
+            nickname: string;
+            avatar: string | null;
         };
     }>;
     refresh(dto: RefreshTokenDto): Promise<{
@@ -19,9 +19,9 @@ export declare class AuthController {
         refreshToken: string;
         expiresIn: number;
         user: {
-            id: any;
-            nickname: any;
-            avatar: any;
+            id: string;
+            nickname: string;
+            avatar: string | null;
         };
     }>;
     me(user: JwtPayload): Promise<{

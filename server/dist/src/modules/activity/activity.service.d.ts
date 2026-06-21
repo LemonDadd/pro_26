@@ -3,10 +3,10 @@ export declare class ActivityService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     add(tripId: string, userId: string, type: string, content: string, amount?: number, metadata?: Record<string, any>): Promise<{
+        userId: string;
         id: string;
         createdAt: Date;
         tripId: string;
-        userId: string;
         type: string;
         content: string;
         amount: number | null;
@@ -25,10 +25,10 @@ export declare class ActivityService {
                 nickname: string;
                 avatar: string | null;
             };
+            userId: string;
             id: string;
             createdAt: Date;
             tripId: string;
-            userId: string;
             type: string;
             content: string;
         }[];

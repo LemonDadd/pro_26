@@ -12,8 +12,7 @@ import {
 import { TripService } from './trip.service';
 import { CreateTripDto, UpdateTripDto } from './dto/trip.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { TripAccessGuard } from '@/common/guards/trip-access.guard';
-import { RequireLeader } from '@/common/guards/trip-access.guard';
+import { TripAccessGuard, RequireLeader, TripIdParam } from '@/common/guards/trip-access.guard';
 import { CurrentUser, JwtPayload } from '@/common/decorators/current-user.decorator';
 
 @Controller('trips')
@@ -45,12 +44,14 @@ export class TripController {
   }
 
   @Get(':id')
+  @TripIdParam('id')
   @UseGuards(TripAccessGuard)
   async detail(@Param('id') id: string) {
     return this.tripService.detail(id);
   }
 
   @Put(':id')
+  @TripIdParam('id')
   @UseGuards(TripAccessGuard)
   @RequireLeader()
   async update(@Param('id') id: string, @Body() dto: UpdateTripDto) {
@@ -58,6 +59,7 @@ export class TripController {
   }
 
   @Delete(':id')
+  @TripIdParam('id')
   @UseGuards(TripAccessGuard)
   @RequireLeader()
   async remove(@Param('id') id: string) {
@@ -65,6 +67,7 @@ export class TripController {
   }
 
   @Post(':id/complete')
+  @TripIdParam('id')
   @UseGuards(TripAccessGuard)
   @RequireLeader()
   async complete(@Param('id') id: string) {
@@ -72,6 +75,7 @@ export class TripController {
   }
 
   @Get(':id/summary')
+  @TripIdParam('id')
   @UseGuards(TripAccessGuard)
   async summary(@Param('id') id: string) {
     return this.tripService.summary(id);

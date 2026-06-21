@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
-import { calculateUserBalances } from '@/utils/aa-calculator';
-import { generateInviteCode } from '@/utils/aa-calculator';
+import { calculateUserBalances, toExpenseLike } from '@/utils/aa-calculator';
+import { generateUniqueInviteCode } from '@/utils/invite-code';
 import { throwBiz, ErrorCodes } from '@/common/exceptions/business.exception';
 
 @Injectable()
@@ -19,10 +19,11 @@ export class MemberService {
     });
     const trip = await this.prisma.trip.findUnique({
       where: { id: tripId },
-      include: { expenses: true },
+      include: { expenses: { include: { splits: true } } },
     });
     const memberIds = memberships.map((m) => m.userId);
-    const balances = calculateUserBalances(trip?.expenses ?? [], memberIds);
+    const expenses = (trip?.expenses ?? []).map((e) => toExpenseLike(e));
+    const balances = calculateUserBalances(expenses, memberIds);
 
     return {
       list: memberships.map((m) => {
@@ -79,7 +80,7 @@ export class MemberService {
   async generateInviteCode(tripId: string) {
     const trip = await this.prisma.trip.findUnique({ where: { id: tripId } });
     if (!trip) throwBiz(ErrorCodes.TRIP_NOT_FOUND);
-    const code = generateInviteCode();
+    const code = await generateUniqueInviteCode(this.prisma);
     const updated = await this.prisma.trip.update({
       where: { id: tripId },
       data: { inviteCode: code },
