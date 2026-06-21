@@ -6,7 +6,7 @@ import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const SettingsPage: React.FC = () => {
-  const { currentUser, updateCurrentUser, logout } = useTripStore();
+  const { currentUser, updateCurrentUser, uploadFile, logout } = useTripStore();
   const [notifyEnabled, setNotifyEnabled] = useState(true);
   const [splitType, setSplitType] = useState('均摊');
   const [cacheSize, setCacheSize] = useState('12.5MB');
@@ -64,21 +64,23 @@ const SettingsPage: React.FC = () => {
     }
   }, [nicknameInput, updateCurrentUser]);
 
-  const handleAvatarClick = useCallback(() => {
-    Taro.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: async (res) => {
-        const tempFilePath = res.tempFilePaths[0];
-        try {
-          await updateCurrentUser({ avatar: tempFilePath });
-          Taro.showToast({ title: '头像已更新', icon: 'success' });
-        } catch (err) {
-        }
-      },
-    });
-  }, [updateCurrentUser]);
+  const handleAvatarClick = useCallback(async () => {
+    try {
+      const res = await Taro.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+      });
+      const filePath = res.tempFilePaths[0];
+      Taro.showLoading({ title: '上传中...' });
+      const result = await uploadFile(filePath, 'avatar');
+      await updateCurrentUser({ avatar: result.url });
+      Taro.hideLoading();
+      Taro.showToast({ title: '头像更新成功', icon: 'success' });
+    } catch (err) {
+      Taro.hideLoading();
+    }
+  }, [uploadFile, updateCurrentUser]);
 
   const handleAboutClick = useCallback(() => {
     setShowAboutModal(true);

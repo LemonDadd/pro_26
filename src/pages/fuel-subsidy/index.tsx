@@ -11,6 +11,7 @@ import {
 } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
+import { addFuelSubsidy } from '@/services/vehicle';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
 import { formatDateFull } from '@/utils/format';
@@ -18,7 +19,7 @@ import styles from './index.module.scss';
 
 const FuelSubsidyPage: React.FC = () => {
   const router = useRouter();
-  const { trips, currentTripId, currentUser, addExpense } = useTripStore();
+  const { trips, currentTripId } = useTripStore();
 
   const vehicleId = router.params.vehicleId;
 
@@ -104,38 +105,34 @@ const FuelSubsidyPage: React.FC = () => {
       return;
     }
 
-    const payerId = selectedVehicle?.ownerId || currentUser.id;
-    const participants = isSplit ? members.map((m) => m.id) : [payerId];
-
     try {
-      await addExpense(currentTripId, {
-        amount: Number(totalNum.toFixed(2)),
-        category: 'fuel',
-        description: `油费补贴 - ${selectedVehicle?.model || '车辆'}`,
-        payerId,
-        participants,
-        splitType: 'equal',
+      Taro.showLoading({ title: '提交中...' });
+      await addFuelSubsidy(currentTripId, {
+        vehicleId: selectedVehicleId,
+        fuelDate,
+        fuelAmount: amountNum,
+        fuelPrice: priceNum,
+        totalAmount: totalNum,
+        isSplit,
         note: note.trim() || undefined,
       });
-
-      Taro.showToast({ title: '录入成功', icon: 'success' });
+      Taro.hideLoading();
+      Taro.showToast({ title: '提交成功', icon: 'success' });
       setTimeout(() => {
         Taro.navigateBack();
       }, 1000);
     } catch (err) {
+      Taro.hideLoading();
     }
   }, [
     currentTripId,
     selectedVehicleId,
+    fuelDate,
     fuelAmount,
     fuelPrice,
     totalAmount,
     isSplit,
     note,
-    selectedVehicle,
-    currentUser.id,
-    members,
-    addExpense,
   ]);
 
   return (

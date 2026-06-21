@@ -9,19 +9,21 @@ import {
 } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
-import { tripTemplates } from '@/data/templates';
+import { getTemplateDetail } from '@/services/template';
+import type { TripTemplate } from '@/types';
 import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const CreateTripPage: React.FC = () => {
   const router = useRouter();
-  const { addTrip, updateTrip, currentUser, trips } = useTripStore();
+  const { addTrip, updateTrip, currentUser, trips, fetchTemplates } = useTripStore();
 
   const [title, setTitle] = useState('');
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
+  const [templates, setTemplates] = useState<TripTemplate[]>([]);
 
   const tripId = router.params.tripId;
   const templateId = router.params.templateId;
@@ -30,6 +32,12 @@ const CreateTripPage: React.FC = () => {
   const editingTrip = isEditMode
     ? trips.find((t) => t.id === tripId)
     : undefined;
+
+  useEffect(() => {
+    fetchTemplates({ pageSize: 50 })
+      .then(setTemplates)
+      .catch(() => {});
+  }, [fetchTemplates]);
 
   useEffect(() => {
     if (isEditMode && editingTrip) {
@@ -44,21 +52,23 @@ const CreateTripPage: React.FC = () => {
   useEffect(() => {
     if (!isEditMode && templateId) {
       setSelectedTemplateId(templateId);
-      const template = tripTemplates.find((t) => t.id === templateId);
-      if (template) {
-        setTitle(template.name + '之旅');
-        setDestination(template.name);
-      }
+      getTemplateDetail(templateId)
+        .then((template) => {
+          setTitle(template.name + '之旅');
+          setDestination(template.name);
+        })
+        .catch(() => {});
     }
   }, [templateId, isEditMode]);
 
   const handleTemplateSelect = useCallback((id: string) => {
     setSelectedTemplateId(id);
-    const template = tripTemplates.find((t) => t.id === id);
-    if (template) {
-      setTitle(template.name + '之旅');
-      setDestination(template.name);
-    }
+    getTemplateDetail(id)
+      .then((template) => {
+        setTitle(template.name + '之旅');
+        setDestination(template.name);
+      })
+      .catch(() => {});
   }, []);
 
   const handleDateChange = useCallback(
@@ -87,7 +97,7 @@ const CreateTripPage: React.FC = () => {
       return;
     }
 
-    const template = tripTemplates.find((t) => t.id === selectedTemplateId);
+    const template = templates.find((t) => t.id === selectedTemplateId);
 
     try {
       if (isEditMode && tripId) {
@@ -194,7 +204,7 @@ const CreateTripPage: React.FC = () => {
             <Text className={styles.sectionTitle}>选择模板（可选）</Text>
           </View>
           <View className={styles.templateList}>
-            {tripTemplates.map((template) => (
+            {templates.map((template) => (
               <View
                 key={template.id}
                 className={`${styles.templateItem} ${selectedTemplateId === template.id ? styles.selected : ''}`}

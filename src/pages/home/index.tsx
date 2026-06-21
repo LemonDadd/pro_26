@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
 } from '@tarojs/components';
 import Taro, { useDidShow, usePullDownRefresh } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
-import { tripTemplates } from '@/data/templates';
+import type { TripTemplate } from '@/types';
 import TripCard from '@/components/TripCard';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
@@ -16,8 +16,15 @@ import { getTotalExpense } from '@/utils/aaCalculator';
 import styles from './index.module.scss';
 
 const HomePage: React.FC = () => {
-  const { trips, currentUser, setCurrentTrip, fetchTrips, initialized } = useTripStore();
+  const { trips, currentUser, setCurrentTrip, fetchTrips, initialized, joinByCode, fetchTemplates } = useTripStore();
   const [, setRefreshing] = useState(false);
+  const [templates, setTemplates] = useState<TripTemplate[]>([]);
+
+  useEffect(() => {
+    fetchTemplates({ pageSize: 6 })
+      .then(setTemplates)
+      .catch(() => {});
+  }, [fetchTemplates]);
 
   useDidShow(() => {
     if (initialized && trips.length === 0) {
@@ -40,24 +47,29 @@ const HomePage: React.FC = () => {
     Taro.navigateTo({ url: '/pages/create-trip/index' });
   }, []);
 
-  const handleScanJoin = useCallback(() => {
-    Taro.showToast({
-      title: '扫码加入行程',
-      icon: 'none',
-    });
-  }, []);
+  const handleScanJoin = useCallback(async () => {
+    try {
+      const res = await Taro.scanCode({ onlyFromCamera: false, scanType: ['qrCode'] });
+      const code = res.result;
+      if (!code) return;
+      Taro.showLoading({ title: '加入中...' });
+      await joinByCode(code);
+      Taro.hideLoading();
+      Taro.showToast({ title: '加入成功', icon: 'success' });
+      setTimeout(() => Taro.switchTab({ url: '/pages/home/index' }), 1000);
+    } catch (err) {
+      Taro.hideLoading();
+    }
+  }, [joinByCode]);
 
   const handleViewAllTrips = useCallback(() => {
-    console.log('查看全部行程');
+    Taro.switchTab({ url: '/pages/expense/index' });
   }, []);
 
   const handleSelectTemplate = useCallback((templateId: string) => {
-    const template = tripTemplates.find((t) => t.id === templateId);
-    if (template) {
-      Taro.navigateTo({
-        url: `/pages/create-trip/index?templateId=${templateId}`,
-      });
-    }
+    Taro.navigateTo({
+      url: `/pages/create-trip/index?templateId=${templateId}`,
+    });
   }, []);
 
   const handleTripClick = useCallback(
@@ -156,10 +168,10 @@ const HomePage: React.FC = () => {
       <View className={styles.templatesSection}>
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>热门模板</Text>
-          <Text className={styles.moreBtn}>更多 →</Text>
+          <Text className={styles.moreBtn} onClick={() => Taro.navigateTo({ url: '/pages/templates/index' })}>更多 →</Text>
         </View>
         <ScrollView scrollX className={styles.templateList}>
-          {tripTemplates.map((template) => (
+          {templates.map((template) => (
             <View
               key={template.id}
               className={styles.templateCard}

@@ -11,7 +11,7 @@ import type { SettlementPlan } from '@/types';
 import styles from './index.module.scss';
 
 const SettlePage: React.FC = () => {
-  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled } = useTripStore();
+  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled, shareSettlement } = useTripStore();
   const [plan, setPlan] = useState<SettlementPlan | null>(null);
 
   useDidShow(() => {
@@ -52,12 +52,19 @@ const SettlePage: React.FC = () => {
     [markSettled, toggleSettled]
   );
 
-  const handleShareSettlement = useCallback(() => {
-    Taro.showToast({
-      title: '生成结算单分享',
-      icon: 'none',
-    });
-  }, []);
+  const handleShareSettlement = useCallback(async () => {
+    if (!currentTripId) return;
+    Taro.showLoading({ title: '生成中...' });
+    try {
+      const result = await shareSettlement(currentTripId);
+      Taro.hideLoading();
+      if (result.shareUrl) {
+        Taro.setClipboardData({ data: result.shareUrl });
+      }
+    } catch (err) {
+      Taro.hideLoading();
+    }
+  }, [currentTripId, shareSettlement]);
 
   const getBalanceUser = (userId: string) => {
     return getUserById(members, userId);

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useRef, useEffect } from 'react';
+import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,8 @@ import { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
 import Avatar from '@/components/Avatar';
 import NavBar from '@/components/NavBar';
-import {
-  getTotalExpense,
-  getAveragePerPerson,
-  getCategoryStats,
-  calculateUserBalances,
-} from '@/utils/aaCalculator';
 import { categoryLabels, categoryEmojis } from '@/utils/format';
-import { ExpenseCategory } from '@/types';
+import { ExpenseCategory, CategoryStat, MyBill } from '@/types';
 import styles from './index.module.scss';
 
 const categoryColors: Record<ExpenseCategory, string> = {
@@ -33,13 +27,24 @@ const categoryColors: Record<ExpenseCategory, string> = {
 };
 
 const StatsPage: React.FC = () => {
-  const { trips, currentTripId, currentUser, fetchExpenses } = useTripStore();
+  const { trips, currentTripId, currentUser, fetchExpenses, fetchCategoryStats, fetchMyBill } = useTripStore();
   const canvasRef = useRef<any>(null);
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+  const [myBill, setMyBill] = useState<MyBill | null>(null);
+  const [totalExpense, setTotalExpense] = useState(0);
 
   useDidShow(() => {
-    if (currentTripId) {
-      fetchExpenses(currentTripId).catch(() => {});
-    }
+    if (!currentTripId) return;
+    fetchExpenses(currentTripId).catch(() => {});
+    fetchCategoryStats(currentTripId)
+      .then((res) => {
+        setCategoryStats(res.categoryStats || []);
+        setTotalExpense(res.totalExpense || 0);
+      })
+      .catch(() => {});
+    fetchMyBill(currentTripId)
+      .then(setMyBill)
+      .catch(() => {});
   });
 
   const currentTrip = useMemo(
@@ -47,20 +52,14 @@ const StatsPage: React.FC = () => {
     [trips, currentTripId]
   );
 
-  const expenses = currentTrip?.expenses || [];
   const members = currentTrip?.members || [];
+  const avgPerPerson = members.length > 0 ? totalExpense / members.length : 0;
 
-  const totalExpense = getTotalExpense(expenses);
-  const avgPerPerson = getAveragePerPerson(expenses, members.length);
-  const categoryStats = getCategoryStats(expenses);
+  const myBalance = myBill
+    ? { paid: myBill.paid || 0, shouldPay: myBill.shouldPay || 0, balance: (myBill.paid || 0) - (myBill.shouldPay || 0) }
+    : { paid: 0, shouldPay: 0, balance: 0 };
 
-  const userBalances = useMemo(() => {
-    return calculateUserBalances(expenses, members);
-  }, [expenses, members]);
-
-  const myBalance = useMemo(() => {
-    return userBalances.find((b) => b.userId === currentUser.id);
-  }, [userBalances, currentUser.id]);
+  const expenseCount = currentTrip?.expenses?.length || 0;
 
   const getBalanceClass = (balance: number) => {
     if (balance > 0.01) return styles.positive;
@@ -170,7 +169,7 @@ const StatsPage: React.FC = () => {
               <Text className={styles.overviewLabel}>人均花费</Text>
             </View>
             <View className={styles.overviewItem}>
-              <Text className={styles.overviewValue}>{expenses.length}</Text>
+              <Text className={styles.overviewValue}>{expenseCount}</Text>
               <Text className={styles.overviewLabel}>记账笔数</Text>
             </View>
           </View>

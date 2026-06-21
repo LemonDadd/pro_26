@@ -14,8 +14,10 @@ import styles from './index.module.scss';
 
 const TripDetailPage: React.FC = () => {
   const router = useRouter();
-  const { trips, setCurrentTrip, fetchTripDetail, loading } = useTripStore();
+  const { trips, setCurrentTrip, fetchTripDetail, loading, generateInviteCode } = useTripStore();
   const [loaded, setLoaded] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+  const [qrLoading, setQrLoading] = useState(false);
 
   const tripId = router.params.id;
 
@@ -38,6 +40,20 @@ const TripDetailPage: React.FC = () => {
   const handleViewMembers = useCallback(() => {
     Taro.navigateTo({ url: `/pages/members/index?tripId=${tripId}` });
   }, [tripId]);
+
+  const handleInvite = useCallback(async () => {
+    if (!tripId || qrLoading) return;
+    setQrLoading(true);
+    try {
+      const { inviteCode: code } = await generateInviteCode(tripId);
+      setInviteCode(code);
+      Taro.setClipboardData({ data: code });
+    } catch (err) {
+    } finally {
+      setQrLoading(false);
+    }
+  }, [tripId, generateInviteCode, qrLoading]);
+
 
 
 
@@ -139,12 +155,15 @@ const TripDetailPage: React.FC = () => {
             <Text className={styles.sectionTitle}>邀请伙伴</Text>
           </View>
           <View className={styles.qrCard}>
-            <View className={styles.qrPlaceholder}>
+            <View className={styles.qrPlaceholder} onClick={handleInvite}>
               <Text className={styles.qrIcon}>📱</Text>
             </View>
             <Text className={styles.qrTip}>
               生成小程序码，分享到微信群邀请伙伴加入
             </Text>
+            {inviteCode ? (
+              <Text className={styles.qrTip}>邀请码：{inviteCode}</Text>
+            ) : null}
           </View>
         </View>
       </ScrollView>

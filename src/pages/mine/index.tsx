@@ -1,27 +1,25 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
-import { getTotalExpense } from '@/utils/aaCalculator';
+import type { PersonalStats } from '@/types';
 import NavBar from '@/components/NavBar';
 import styles from './index.module.scss';
 
 const MinePage: React.FC = () => {
-  const { trips, currentUser, fetchTrips } = useTripStore();
+  const { currentUser, fetchMineSummary } = useTripStore();
+  const [summary, setSummary] = useState<PersonalStats | null>(null);
 
   useDidShow(() => {
-    fetchTrips().catch(() => {});
+    fetchMineSummary()
+      .then((res) => setSummary(res.stats))
+      .catch(() => {});
   });
 
-  const myTrips = trips.filter((t) =>
-    t.members.some((m) => m.id === currentUser.id)
-  );
-
-  const totalSpent = myTrips.reduce(
-    (sum, t) => sum + getTotalExpense(t.expenses || []),
-    0
-  );
+  const totalTrips = summary?.totalTrips || 0;
+  const totalSpent = summary?.totalExpense || 0;
+  const expenseCount = summary?.totalExpenseCount || 0;
 
   const handleMenuItem = useCallback((key: string) => {
     const actions: Record<string, () => void> = {
@@ -78,7 +76,7 @@ const MinePage: React.FC = () => {
       <View className={styles.statsCard}>
         <View className={styles.statsGrid}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{myTrips.length}</Text>
+            <Text className={styles.statValue}>{totalTrips}</Text>
             <Text className={styles.statLabel}>次旅行</Text>
           </View>
           <View className={styles.statItem}>
@@ -88,14 +86,7 @@ const MinePage: React.FC = () => {
             <Text className={styles.statLabel}>累计花费</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>
-              {
-                trips.reduce(
-                  (sum, t) => sum + (t.expenses?.length || 0),
-                  0
-                )
-              }
-            </Text>
+            <Text className={styles.statValue}>{expenseCount}</Text>
             <Text className={styles.statLabel}>记账笔数</Text>
           </View>
         </View>

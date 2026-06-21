@@ -21,7 +21,7 @@ import styles from './index.module.scss';
 
 const AddExpensePage: React.FC = () => {
   const router = useRouter();
-  const { trips, currentTripId, currentUser, addExpense, updateExpense, getExpenseById } = useTripStore();
+  const { trips, currentTripId, currentUser, addExpense, updateExpense, getExpenseById, uploadFile } = useTripStore();
 
   const expenseId = router.params.expenseId;
   const isEditMode = !!expenseId;
@@ -135,22 +135,26 @@ const AddExpensePage: React.FC = () => {
     }
   }, [members, selectedMembers.length]);
 
-  const handleChooseImage = useCallback(() => {
-    Taro.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        if (res.tempFilePaths && res.tempFilePaths.length > 0) {
-          setReceiptImage(res.tempFilePaths[0]);
-          Taro.showToast({ title: '图片已添加', icon: 'success' });
-        }
-      },
-      fail: (err) => {
-        console.error('[AddExpense] 选择图片失败', err);
-      },
-    });
-  }, []);
+  const handleChooseImage = useCallback(async () => {
+    try {
+      const res = await Taro.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+      });
+      if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+        const filePath = res.tempFilePaths[0];
+        Taro.showLoading({ title: '上传中...' });
+        const result = await uploadFile(filePath, 'receipt');
+        setReceiptImage(result.url);
+        Taro.hideLoading();
+        Taro.showToast({ title: '图片已添加', icon: 'success' });
+      }
+    } catch (err) {
+      Taro.hideLoading();
+      console.error('[AddExpense] 选择图片失败', err);
+    }
+  }, [uploadFile]);
 
   const handleSubmit = useCallback(async () => {
     if (!currentTripId) {

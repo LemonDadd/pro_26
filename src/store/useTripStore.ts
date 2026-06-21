@@ -7,6 +7,10 @@ import type {
   Vehicle,
   Activity,
   SettlementPlan,
+  TripStats,
+  TripTemplate,
+  PersonalStats,
+  MyBill,
 } from '@/types';
 import * as authService from '@/services/auth';
 import * as tripService from '@/services/trip';
@@ -15,6 +19,9 @@ import * as memberService from '@/services/member';
 import * as vehicleService from '@/services/vehicle';
 import * as settlementService from '@/services/settlement';
 import * as activityService from '@/services/activity';
+import * as statsService from '@/services/stats';
+import * as templateService from '@/services/template';
+import * as fileService from '@/services/file';
 import { getToken, clearAuth } from '@/services/request';
 
 const DEV_LOGIN_CODE = 'dev_mock_code_001';
@@ -88,6 +95,15 @@ interface TripStore {
   getActivitiesByTrip: (tripId: string) => Activity[];
 
   updateCurrentUser: (updates: authService.UpdateProfileParams) => Promise<void>;
+
+  fetchTripSummary: (tripId: string) => Promise<TripStats>;
+  fetchTemplates: (params?: templateService.ListTemplatesParams) => Promise<TripTemplate[]>;
+  applyTemplate: (templateId: string, params: templateService.ApplyTemplateParams) => Promise<Trip>;
+  fetchMineSummary: () => Promise<{ user: User; stats: PersonalStats }>;
+  fetchCategoryStats: (tripId: string) => Promise<statsService.CategoryStatsResult>;
+  fetchMyBill: (tripId: string) => Promise<MyBill>;
+  shareSettlement: (tripId: string) => Promise<{ shareUrl: string; imageUrl: string; qrCodeUrl: string }>;
+  uploadFile: (filePath: string, type: 'receipt' | 'avatar' | 'other') => Promise<fileService.UploadResult>;
 }
 
 function upsertTrip(list: Trip[], trip: Trip): Trip[] {
@@ -390,5 +406,47 @@ export const useTripStore = create<TripStore>((set, get) => ({
     set((state) => ({
       currentUser: { ...state.currentUser, ...user },
     }));
+  },
+
+  fetchTripSummary: async (tripId) => {
+    return tripService.getTripSummary(tripId);
+  },
+
+  fetchTemplates: async (params) => {
+    const page = await templateService.listTemplates(params);
+    return page.list;
+  },
+
+  applyTemplate: async (templateId, params) => {
+    const trip = await templateService.applyTemplate(templateId, params);
+    set((state) => ({
+      trips: [trip, ...state.trips],
+      currentTripId: trip.id,
+    }));
+    return trip;
+  },
+
+  fetchMineSummary: async () => {
+    const data = await statsService.getMineSummary();
+    return {
+      user: data.user as unknown as User,
+      stats: data.stats,
+    };
+  },
+
+  fetchCategoryStats: async (tripId) => {
+    return statsService.getCategoryStats(tripId);
+  },
+
+  fetchMyBill: async (tripId) => {
+    return statsService.getMyBill(tripId);
+  },
+
+  shareSettlement: async (tripId) => {
+    return settlementService.shareSettlement(tripId);
+  },
+
+  uploadFile: async (filePath, type) => {
+    return fileService.uploadFile(filePath, type);
   },
 }));

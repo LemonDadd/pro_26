@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,10 @@ import {
   Button,
   Image,
 } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import { useTripStore } from '@/store/useTripStore';
+import { getExpenseDetail } from '@/services/expense';
+import type { Expense } from '@/types';
 import Avatar from '@/components/Avatar';
 import CategoryIcon from '@/components/CategoryIcon';
 import { categoryLabels, formatTimestamp, formatMoney } from '@/utils/format';
@@ -20,17 +22,21 @@ const ExpenseDetailPage: React.FC = () => {
 
   const expenseId = router.params.id;
 
+  const [expense, setExpense] = useState<Expense | null>(null);
+
   const currentTrip = useMemo(
     () => trips.find((t) => t.id === currentTripId),
     [trips, currentTripId]
   );
 
-  const expense = useMemo(
-    () => currentTrip?.expenses?.find((e) => e.id === expenseId),
-    [currentTrip, expenseId]
-  );
-
   const members = currentTrip?.members || [];
+
+  useDidShow(() => {
+    if (!expenseId) return;
+    getExpenseDetail(expenseId)
+      .then((data) => setExpense(data))
+      .catch(() => {});
+  });
 
   const payer = useMemo(
     () => members.find((m) => m.id === expense?.payerId),

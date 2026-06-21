@@ -14,7 +14,7 @@ import type { SettlementPlan } from '@/types';
 import styles from './index.module.scss';
 
 const SettleDetailPage: React.FC = () => {
-  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled } = useTripStore();
+  const { trips, currentTripId, fetchSettlement, markSettled, toggleSettled, isItemSettled, shareSettlement } = useTripStore();
   const [plan, setPlan] = useState<SettlementPlan | null>(null);
 
   useDidShow(() => {
@@ -73,22 +73,28 @@ const SettleDetailPage: React.FC = () => {
     [isItemSettled, markSettled, toggleSettled]
   );
 
-  const handleShare = useCallback(() => {
-    Taro.showActionSheet({
-      itemList: ['生成结算单图片', '分享到微信群', '复制结算信息'],
-      success: (res) => {
-        const actions = [
-          '结算单图片生成中...',
-          '正在生成分享卡片...',
-          '结算信息已复制',
-        ];
-        Taro.showToast({
-          title: actions[res.tapIndex],
-          icon: 'none',
-        });
-      },
-    });
-  }, []);
+  const handleShare = useCallback(async () => {
+    if (!currentTripId) return;
+    Taro.showLoading({ title: '生成中...' });
+    try {
+      const result = await shareSettlement(currentTripId);
+      Taro.hideLoading();
+      Taro.showActionSheet({
+        itemList: ['生成结算单图片', '分享到微信群', '复制结算信息'],
+        success: (res) => {
+          if (res.tapIndex === 2) {
+            Taro.setClipboardData({ data: result.shareUrl || '' });
+          } else if (res.tapIndex === 0 && result.imageUrl) {
+            Taro.previewImage({ urls: [result.imageUrl] });
+          } else {
+            Taro.showToast({ title: '分享卡片已生成', icon: 'none' });
+          }
+        },
+      });
+    } catch (err) {
+      Taro.hideLoading();
+    }
+  }, [currentTripId, shareSettlement]);
 
   return (
     <View className={styles.page}>
