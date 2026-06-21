@@ -117,12 +117,12 @@ const VehiclesPage: React.FC = () => {
                   <View className={styles.vehicleOwner}>
                     <Avatar
                       src={owner?.avatar}
-                      name={owner?.name}
+                      name={owner?.nickname}
                       size="small"
                     />
                     <Text className={styles.ownerLabel}>车主</Text>
                     <Text className={styles.ownerName}>
-                      {owner?.name || '未知'}
+                      {owner?.nickname || '未知'}
                     </Text>
                   </View>
                 </View>

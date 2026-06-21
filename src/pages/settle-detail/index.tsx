@@ -60,7 +60,7 @@ const SettleDetailPage: React.FC = () => {
       const toUser = getUserById(item.toUserId);
       Taro.showModal({
         title: '转账提示',
-        content: `请向 ${toUser?.name || 'TA'} 转账 ¥${formatMoney(
+        content: `请向 ${toUser?.nickname || 'TA'} 转账 ¥${formatMoney(
           item.amount
         )}\n\n转账完成后点击「已结清」标记`,
         confirmText: '知道了',
@@ -145,12 +145,12 @@ const SettleDetailPage: React.FC = () => {
                   <View className={styles.settleFrom}>
                     <Avatar
                       src={fromUser?.avatar}
-                      name={fromUser?.name}
+                      name={fromUser?.nickname}
                       size="medium"
                       style={{ marginLeft: 'auto', marginBottom: 4 }}
                     />
                     <Text className={styles.userName}>
-                      {fromUser?.name || '未知'}
+                      {fromUser?.nickname || '未知'}
                     </Text>
                   </View>
 
@@ -169,12 +169,12 @@ const SettleDetailPage: React.FC = () => {
                   <View className={styles.settleTo}>
                     <Avatar
                       src={toUser?.avatar}
-                      name={toUser?.name}
+                      name={toUser?.nickname}
                       size="medium"
                       style={{ marginBottom: 4 }}
                     />
                     <Text className={styles.userName}>
-                      {toUser?.name || '未知'}
+                      {toUser?.nickname || '未知'}
                     </Text>
                   </View>
 

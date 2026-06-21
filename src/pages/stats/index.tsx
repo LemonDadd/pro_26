@@ -183,11 +183,11 @@ const StatsPage: React.FC = () => {
           <View className={styles.personalCard}>
             <Avatar
               src={currentUser.avatar}
-              name={currentUser.name}
+              name={currentUser.nickname}
               size="large"
             />
             <View className={styles.personalInfo}>
-              <Text className={styles.personalName}>{currentUser.name}</Text>
+              <Text className={styles.personalName}>{currentUser.nickname}</Text>
               <View className={styles.personalStats}>
                 <View className={styles.personalStat}>
                   <Text className={styles.personalStatValue}>

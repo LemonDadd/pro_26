@@ -47,8 +47,8 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({
         </View>
         <View className={styles.expenseMeta}>
           <View className={styles.payerInfo}>
-            <Avatar src={payer?.avatar} name={payer?.name} size="small" />
-            <Text className={styles.payerName}>{payer?.name} 付</Text>
+            <Avatar src={payer?.avatar} name={payer?.nickname} size="small" />
+            <Text className={styles.payerName}>{payer?.nickname} 付</Text>
           </View>
           <Text className={styles.categoryTag}>
             {categoryLabels[expense.category]}

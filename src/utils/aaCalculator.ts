@@ -16,10 +16,9 @@ export function calculateUserBalances(
     }
 
     if (expense.splitType === 'equal' && expense.participants.length > 0) {
-      const perPerson = expense.amount / expense.participants.length;
-      expense.participants.forEach((userId) => {
-        if (balances[userId]) {
-          balances[userId].shouldPay += perPerson;
+      expense.participants.forEach((p) => {
+        if (balances[p.id]) {
+          balances[p.id].shouldPay += p.splitAmount;
         }
       });
     } else if (expense.splitType === 'percentage' && expense.splits) {

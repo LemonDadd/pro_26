@@ -95,7 +95,7 @@ const TripDetailPage: React.FC = () => {
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>队长</Text>
-            <Text className={styles.infoValue}>{leader?.name || '-'}</Text>
+            <Text className={styles.infoValue}>{leader?.nickname || '-'}</Text>
           </View>
         </View>
 
@@ -109,8 +109,8 @@ const TripDetailPage: React.FC = () => {
           <View className={styles.memberList}>
             {trip.members.slice(0, 6).map((member) => (
               <View key={member.id} className={styles.memberItem}>
-                <Avatar src={member.avatar} name={member.name} size="large" />
-                <Text className={styles.memberName}>{member.name}</Text>
+                <Avatar src={member.avatar} name={member.nickname} size="large" />
+                <Text className={styles.memberName}>{member.nickname}</Text>
                 {member.id === trip.leaderId && (
                   <Text className={styles.leaderBadge}>队长</Text>
                 )}

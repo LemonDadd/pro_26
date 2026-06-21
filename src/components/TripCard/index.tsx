@@ -68,7 +68,7 @@ const TripCard: React.FC<TripCardProps> = ({ trip, className, onClick }) => {
                 className={styles.avatarWrap}
                 style={{ marginLeft: index > 0 ? '-16rpx' : 0 }}
               >
-                <Avatar src={member.avatar} name={member.name} size="small" />
+                <Avatar src={member.avatar} name={member.nickname} size="small" />
               </View>
             ))}
             {trip.members.length > 4 && (
@@ -90,7 +90,7 @@ const TripCard: React.FC<TripCardProps> = ({ trip, className, onClick }) => {
         {leader && (
           <View className={styles.leaderInfo}>
             <Text className={styles.leaderLabel}>队长：</Text>
-            <Text className={styles.leaderName}>{leader.name}</Text>
+            <Text className={styles.leaderName}>{leader.nickname}</Text>
           </View>
         )}
       </View>

@@ -35,7 +35,7 @@ const SettlementItem: React.FC<SettlementItemProps> = ({
             duration: 1500,
           });
         } else if (res.tapIndex === 1) {
-          const text = `${fromUser.name} 转给 ${toUser.name} ${formatMoney(amount)}`;
+          const text = `${fromUser.nickname} 转给 ${toUser.nickname} ${formatMoney(amount)}`;
           Taro.setClipboardData({
             data: text,
             success: () => {
@@ -57,8 +57,8 @@ const SettlementItem: React.FC<SettlementItemProps> = ({
     <View className={classNames(styles.settlementItem, className, settled && styles.settled)}>
       <View className={styles.userSection}>
         <View className={styles.userInfo}>
-          <Avatar src={fromUser.avatar} name={fromUser.name} size="medium" />
-          <Text className={styles.userName}>{fromUser.name}</Text>
+          <Avatar src={fromUser.avatar} name={fromUser.nickname} size="medium" />
+          <Text className={styles.userName}>{fromUser.nickname}</Text>
         </View>
 
         <View className={styles.transferArrow}>
@@ -67,8 +67,8 @@ const SettlementItem: React.FC<SettlementItemProps> = ({
         </View>
 
         <View className={styles.userInfo}>
-          <Avatar src={toUser.avatar} name={toUser.name} size="medium" />
-          <Text className={styles.userName}>{toUser.name}</Text>
+          <Avatar src={toUser.avatar} name={toUser.nickname} size="medium" />
+          <Text className={styles.userName}>{toUser.nickname}</Text>
         </View>
       </View>
 

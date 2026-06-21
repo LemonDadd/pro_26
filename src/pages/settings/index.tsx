@@ -12,7 +12,7 @@ const SettingsPage: React.FC = () => {
   const [cacheSize, setCacheSize] = useState('12.5MB');
 
   const [showNicknameModal, setShowNicknameModal] = useState(false);
-  const [nicknameInput, setNicknameInput] = useState(currentUser.name);
+  const [nicknameInput, setNicknameInput] = useState(currentUser.nickname);
   const nicknameInputRef = useRef<any>(null);
 
   const [showAboutModal, setShowAboutModal] = useState(false);
@@ -47,16 +47,16 @@ const SettingsPage: React.FC = () => {
   }, []);
 
   const handleNicknameClick = useCallback(() => {
-    setNicknameInput(currentUser.name);
+    setNicknameInput(currentUser.nickname);
     setShowNicknameModal(true);
-  }, [currentUser.name]);
+  }, [currentUser.nickname]);
 
   const handleNicknameConfirm = useCallback(() => {
     if (!nicknameInput.trim()) {
       Taro.showToast({ title: '昵称不能为空', icon: 'none' });
       return;
     }
-    updateCurrentUser({ name: nicknameInput.trim() });
+    updateCurrentUser({ nickname: nicknameInput.trim() });
     setShowNicknameModal(false);
     Taro.showToast({ title: '修改成功', icon: 'success' });
   }, [nicknameInput, updateCurrentUser]);
@@ -178,7 +178,7 @@ const SettingsPage: React.FC = () => {
           type: 'arrow-text',
           icon: '✏️',
           text: '修改昵称',
-          rightText: currentUser.name,
+          rightText: currentUser.nickname,
         },
         {
           key: 'avatar',

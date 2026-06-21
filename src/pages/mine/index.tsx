@@ -69,7 +69,7 @@ const MinePage: React.FC = () => {
             onError={(e) => console.error('[Mine] 头像加载失败', e)}
           />
           <View className={styles.userInfo}>
-            <Text className={styles.userName}>{currentUser.name}</Text>
+            <Text className={styles.userName}>{currentUser.nickname}</Text>
             <Text className={styles.userDesc}>ID: {currentUser.id}</Text>
           </View>
         </View>

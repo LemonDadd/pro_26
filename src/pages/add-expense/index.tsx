@@ -61,7 +61,7 @@ const AddExpensePage: React.FC = () => {
       setCategory(expense.category);
       setPayerId(expense.payerId);
       setSplitType(expense.splitType);
-      setSelectedMembers(expense.participants);
+      setSelectedMembers(expense.participants.map((p) => p.id));
       setNote(expense.note || '');
       setReceiptImage(expense.receiptImage || '');
       setCurrency(currencyCode);
@@ -343,9 +343,9 @@ const AddExpensePage: React.FC = () => {
             <Text className={styles.inputLabel}>付款人</Text>
             <View className={styles.inputContent}>
               <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
-                <Avatar src={members.find(m => m.id === payerId)?.avatar} name={members.find(m => m.id === payerId)?.name} size="small" />
+                <Avatar src={members.find(m => m.id === payerId)?.avatar} name={members.find(m => m.id === payerId)?.nickname} size="small" />
                 <Text className={styles.textInput}>
-                  {members.find(m => m.id === payerId)?.name || '-'}
+                  {members.find(m => m.id === payerId)?.nickname || '-'}
                 </Text>
               </View>
             </View>
@@ -380,10 +380,10 @@ const AddExpensePage: React.FC = () => {
                 <View className={styles.memberInfo}>
                   <Avatar
                     src={member.avatar}
-                    name={member.name}
+                    name={member.nickname}
                     size="medium"
                   />
-                  <Text className={styles.memberName}>{member.name}</Text>
+                  <Text className={styles.memberName}>{member.nickname}</Text>
                 </View>
                 <View
                   className={`${styles.checkbox} ${selectedMembers.includes(member.id) ? styles.checked : ''}`}

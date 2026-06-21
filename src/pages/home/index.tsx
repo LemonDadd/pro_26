@@ -80,12 +80,12 @@ const HomePage: React.FC = () => {
           <View className={styles.userInfo}>
             <Avatar
               src={currentUser.avatar}
-              name={currentUser.name}
+              name={currentUser.nickname}
               size="large"
             />
             <View>
               <Text className={styles.welcomeText}>👋 嗨，欢迎回来</Text>
-              <Text className={styles.userName}>{currentUser.name}</Text>
+              <Text className={styles.userName}>{currentUser.nickname}</Text>
             </View>
           </View>
           <Button className={styles.scanBtn} onClick={handleScanJoin}>

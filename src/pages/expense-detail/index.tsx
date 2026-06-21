@@ -39,14 +39,13 @@ const ExpenseDetailPage: React.FC = () => {
 
   const participantShares = useMemo(() => {
     if (!expense) return [];
-    const shareAmount = expense.amount / expense.participants.length;
-    return expense.participants.map((userId) => {
-      const user = members.find((m) => m.id === userId);
+    return expense.participants.map((p) => {
+      const user = members.find((m) => m.id === p.id);
       return {
-        userId,
-        name: user?.name || '未知',
-        avatar: user?.avatar,
-        shareAmount,
+        userId: p.id,
+        nickname: p.nickname || user?.nickname || '未知',
+        avatar: p.avatar || user?.avatar,
+        shareAmount: p.splitAmount || expense.amount / expense.participants.length,
       };
     });
   }, [expense, members]);
@@ -109,10 +108,10 @@ const ExpenseDetailPage: React.FC = () => {
             <View className={styles.payerInfo}>
               <Avatar
                 src={payer?.avatar}
-                name={payer?.name}
+                name={payer?.nickname}
                 size="small"
               />
-              <Text className={styles.infoValue}>{payer?.name || '-'}</Text>
+              <Text className={styles.infoValue}>{payer?.nickname || '-'}</Text>
             </View>
           </View>
           <View className={styles.infoRow}>
@@ -139,10 +138,10 @@ const ExpenseDetailPage: React.FC = () => {
                 <View className={styles.participantInfo}>
                   <Avatar
                     src={p.avatar}
-                    name={p.name}
+                    name={p.nickname}
                     size="small"
                   />
-                  <Text className={styles.participantName}>{p.name}</Text>
+                  <Text className={styles.participantName}>{p.nickname}</Text>
                 </View>
                 <Text className={styles.shareAmount}>
                   ¥{formatMoney(p.shareAmount)}

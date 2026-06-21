@@ -196,11 +196,11 @@ const VehicleEditPage: React.FC = () => {
               <View className={styles.ownerSelector}>
                 <Avatar
                   src={owner?.avatar}
-                  name={owner?.name}
+                  name={owner?.nickname}
                   size="small"
                 />
                 <Text className={styles.ownerName}>
-                  {owner?.name || '请选择'}
+                  {owner?.nickname || '请选择'}
                 </Text>
                 <Text className={styles.arrowIcon}>›</Text>
               </View>
@@ -229,11 +229,11 @@ const VehicleEditPage: React.FC = () => {
                   >
                     <Avatar
                       src={member.avatar}
-                      name={member.name}
+                      name={member.nickname}
                       size="small"
                     />
                     <Text className={styles.pickerItemText}>
-                      {member.name}
+                      {member.nickname}
                     </Text>
                     {ownerId === member.id && (
                       <Text className={styles.checkIcon}>✓</Text>

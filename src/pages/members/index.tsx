@@ -62,8 +62,9 @@ const MembersPage: React.FC = () => {
     const randomId = `user_${Date.now()}`;
     addMember(currentTripId, {
       id: randomId,
-      name: newNickname.trim(),
+      nickname: newNickname.trim(),
       avatar: `https://picsum.photos/seed/${randomId}/200/200`,
+      role: 'member',
     });
     setNewNickname('');
     setShowAddModal(false);
@@ -94,10 +95,10 @@ const MembersPage: React.FC = () => {
         .reduce((sum, e) => sum + e.amount, 0);
 
       const spent = expenses
-        .filter((e) => e.participants.includes(userId))
+        .filter((e) => e.participants.some((p) => p.id === userId))
         .reduce((sum, e) => {
-          const share = e.amount / e.participants.length;
-          return sum + share;
+          const p = e.participants.find((p) => p.id === userId);
+          return sum + (p?.splitAmount || 0);
         }, 0);
 
       return { paid, spent, balance: paid - spent };
@@ -124,15 +125,15 @@ const MembersPage: React.FC = () => {
               <View key={member.id} className={styles.memberItem}>
                 <Avatar
                   src={member.avatar}
-                  name={member.name}
+                  name={member.nickname}
                   size="large"
                 />
                 <View className={styles.memberInfo}>
                   <Text className={styles.memberName}>
-                    {isLeader && (
+                    {(isLeader || member.role === 'leader') && (
                       <Text className={styles.leaderBadge}>队长</Text>
                     )}
-                    {member.name}
+                    {member.nickname}
                   </Text>
                   <Text className={styles.memberRole}>
                     已付 ¥{formatMoney(stat.paid)} · 分摊 ¥
@@ -183,7 +184,7 @@ const MembersPage: React.FC = () => {
             </View>
             <Text className={styles.modalTitle}>邀请同伴</Text>
             <Text className={styles.modalTripName}>
-              {currentTrip?.name || '行程'}
+              {currentTrip?.title || '行程'}
             </Text>
             <Image
               className={styles.qrcodeImg}

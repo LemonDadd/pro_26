@@ -255,11 +255,11 @@ const FuelSubsidyPage: React.FC = () => {
                 <View className={styles.payerInfo}>
                   <Avatar
                     src={owner?.avatar}
-                    name={owner?.name}
+                    name={owner?.nickname}
                     size="small"
                   />
                   <Text className={styles.payerName}>
-                    {owner?.name || '车主'}
+                    {owner?.nickname || '车主'}
                   </Text>
                 </View>
               </View>

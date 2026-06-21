@@ -123,12 +123,12 @@ const SettlePage: React.FC = () => {
                   <View className={styles.balanceUser}>
                     <Avatar
                       src={user?.avatar}
-                      name={user?.name}
+                      name={user?.nickname}
                       size="medium"
                     />
                     <View className={styles.balanceInfo}>
                       <Text className={styles.userName}>
-                        {user?.name || '未知'}
+                        {user?.nickname || '未知'}
                       </Text>
                       <Text className={styles.userDetail}>
                         已付 ¥{b.paid.toFixed(2)} / 应花 ¥{b.shouldPay.toFixed(2)}
