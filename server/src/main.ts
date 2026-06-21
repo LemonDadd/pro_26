@@ -1,0 +1,31 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, { cors: true });
+  const configService = app.get(ConfigService);
+  const logger = new Logger('Bootstrap');
+
+  app.setGlobalPrefix('api/v1');
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: false,
+    }),
+  );
+
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  const port = configService.get<number>('PORT', 3000);
+  await app.listen(port);
+  logger.log(`🚀 旅行拼车 AA 后端服务已启动: http://localhost:${port}/api/v1`);
+}
+
+bootstrap();

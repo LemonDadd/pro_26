@@ -1,0 +1,92 @@
+import { ExpenseService } from './expense.service';
+import { CreateExpenseDto, UpdateExpenseDto, ListExpenseDto } from './dto/expense.dto';
+import { JwtPayload } from '@/common/decorators/current-user.decorator';
+export declare class ExpenseController {
+    private readonly expenseService;
+    constructor(expenseService: ExpenseService);
+    create(tripId: string, user: JwtPayload, dto: CreateExpenseDto): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    list(tripId: string, query: ListExpenseDto, page?: string, pageSize?: string): Promise<{
+        list: {
+            id: any;
+            tripId: any;
+            amount: any;
+            category: any;
+            description: any;
+            payerId: any;
+            splitType: any;
+            currency: any;
+            exchangeRate: any;
+            originalAmount: any;
+            note: any;
+            receiptUrl: any;
+            createdBy: any;
+            createdAt: any;
+            updatedAt: any;
+            payer: any;
+            participants: any;
+        }[];
+        total: number;
+        page: number;
+        pageSize: number;
+        hasMore: boolean;
+    }>;
+    detail(id: string): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    update(id: string, user: JwtPayload, dto: UpdateExpenseDto): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    remove(id: string, user: JwtPayload): Promise<{
+        id: string;
+    }>;
+}

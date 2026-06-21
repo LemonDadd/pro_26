@@ -1,0 +1,246 @@
+// Prisma schema - 旅行拼车 AA 后端
+// 注：本地开发使用 SQLite（零配置运行），生产环境可切换为 PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  openid    String   @unique
+  unionid   String?
+  nickname  String
+  avatar    String?
+  phone     String?
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tripsLed       Trip[]        @relation("TripLeader")
+  memberships    TripMember[]
+  expensesPaid   Expense[]     @relation("ExpensePayer")
+  expensesCreated Expense[]    @relation("ExpenseCreator")
+  vehiclesOwned  Vehicle[]
+  settlementsFrom Settlement[] @relation("SettlementFrom")
+  settlementsTo  Settlement[] @relation("SettlementTo")
+  activities     Activity[]
+  splits         ExpenseSplit[]
+  templatesCreated TripTemplate[]
+
+  @@map("users")
+}
+
+model Trip {
+  id          String   @id @default(uuid())
+  title       String
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  leaderId    String
+  status      String   @default("active")
+  templateId  String?
+  inviteCode  String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leader     User         @relation("TripLeader", fields: [leaderId], references: [id])
+  template   TripTemplate? @relation(fields: [templateId], references: [id])
+  members    TripMember[]
+  expenses   Expense[]
+  vehicles   Vehicle[]
+  fuelSubsidies FuelSubsidy[]
+  settlements Settlement[]
+  activities  Activity[]
+  dayPlans    TripDayPlan[]
+
+  @@index([leaderId])
+  @@index([status])
+  @@map("trips")
+}
+
+model TripMember {
+  id      String   @id @default(uuid())
+  tripId  String
+  userId  String
+  role    String   @default("member")
+  status  String   @default("active")
+  joinedAt DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([tripId, userId])
+  @@index([tripId])
+  @@index([userId])
+  @@map("trip_members")
+}
+
+model Expense {
+  id           String   @id @default(uuid())
+  tripId       String
+  amount       Float
+  category     String
+  description  String
+  payerId      String
+  splitType    String   @default("equal")
+  currency     String   @default("CNY")
+  exchangeRate Float    @default(1)
+  originalAmount Float?
+  note         String?
+  receiptUrl   String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  trip     Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  payer    User   @relation("ExpensePayer", fields: [payerId], references: [id])
+  creator  User   @relation("ExpenseCreator", fields: [createdBy], references: [id])
+  splits   ExpenseSplit[]
+  fuelSubsidy FuelSubsidy?
+
+  @@index([tripId])
+  @@index([payerId])
+  @@index([category])
+  @@index([createdAt])
+  @@map("expenses")
+}
+
+model ExpenseSplit {
+  id         String  @id @default(uuid())
+  expenseId  String
+  userId     String
+  amount     Float
+  percentage Float?
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([expenseId])
+  @@index([userId])
+  @@map("expense_splits")
+}
+
+model Vehicle {
+  id              String   @id @default(uuid())
+  tripId          String
+  plateNumber     String?
+  model           String
+  capacity        Int      @default(5)
+  fuelConsumption Float?
+  ownerId         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  trip      Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  owner     User   @relation(fields: [ownerId], references: [id])
+  fuelSubsidies FuelSubsidy[]
+
+  @@index([tripId])
+  @@index([ownerId])
+  @@map("vehicles")
+}
+
+model FuelSubsidy {
+  id           String   @id @default(uuid())
+  tripId       String
+  vehicleId    String
+  fuelDate     DateTime
+  fuelAmount   Float
+  fuelPrice    Float
+  totalAmount  Float
+  isSplit      Boolean  @default(true)
+  expenseId    String?  @unique
+  note         String?
+  createdAt    DateTime @default(now())
+
+  trip     Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  vehicle  Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  expense  Expense? @relation(fields: [expenseId], references: [id])
+
+  @@index([tripId])
+  @@index([vehicleId])
+  @@map("fuel_subsidies")
+}
+
+model Settlement {
+  id          String    @id @default(uuid())
+  tripId      String
+  fromUserId  String
+  toUserId    String
+  amount      Float
+  status      String    @default("pending")
+  settledAt   DateTime?
+  settledBy   String?
+  createdAt   DateTime  @default(now())
+
+  trip     Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromUser User @relation("SettlementFrom", fields: [fromUserId], references: [id])
+  toUser   User @relation("SettlementTo", fields: [toUserId], references: [id])
+
+  @@index([tripId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([status])
+  @@map("settlements")
+}
+
+model TripTemplate {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  cover          String?
+  estimatedDays  Int
+  estimatedBudget Float?
+  categories     String?
+  tags           String?
+  sampleDays     String?
+  isPublic       Boolean  @default(true)
+  createdBy      String?
+  createdAt      DateTime @default(now())
+
+  trips   Trip[]
+  creator User? @relation(fields: [createdBy], references: [id])
+
+  @@index([isPublic])
+  @@map("trip_templates")
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  tripId    String
+  userId    String
+  type      String
+  content   String
+  amount    Float?
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([tripId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+model TripDayPlan {
+  id          String   @id @default(uuid())
+  tripId      String
+  day         Int
+  date        DateTime?
+  destination String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([tripId, day])
+  @@index([tripId])
+  @@map("trip_day_plans")
+}

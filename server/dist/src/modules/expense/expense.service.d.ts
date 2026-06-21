@@ -1,0 +1,96 @@
+import { PrismaService } from '@/prisma/prisma.service';
+import { ActivityService } from '@/modules/activity/activity.service';
+import { CreateExpenseDto, UpdateExpenseDto, ListExpenseDto } from './dto/expense.dto';
+export declare class ExpenseService {
+    private readonly prisma;
+    private readonly activityService;
+    constructor(prisma: PrismaService, activityService: ActivityService);
+    private buildSplits;
+    create(tripId: string, createdBy: string, dto: CreateExpenseDto): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    list(tripId: string, query: ListExpenseDto, page?: number, pageSize?: number): Promise<{
+        list: {
+            id: any;
+            tripId: any;
+            amount: any;
+            category: any;
+            description: any;
+            payerId: any;
+            splitType: any;
+            currency: any;
+            exchangeRate: any;
+            originalAmount: any;
+            note: any;
+            receiptUrl: any;
+            createdBy: any;
+            createdAt: any;
+            updatedAt: any;
+            payer: any;
+            participants: any;
+        }[];
+        total: number;
+        page: number;
+        pageSize: number;
+        hasMore: boolean;
+    }>;
+    detail(id: string): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    update(id: string, userId: string, dto: UpdateExpenseDto): Promise<{
+        id: any;
+        tripId: any;
+        amount: any;
+        category: any;
+        description: any;
+        payerId: any;
+        splitType: any;
+        currency: any;
+        exchangeRate: any;
+        originalAmount: any;
+        note: any;
+        receiptUrl: any;
+        createdBy: any;
+        createdAt: any;
+        updatedAt: any;
+        payer: any;
+        participants: any;
+    }>;
+    remove(id: string, userId: string): Promise<{
+        id: string;
+    }>;
+    private detailInclude;
+    private formatExpense;
+}
