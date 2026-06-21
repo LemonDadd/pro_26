@@ -42,8 +42,8 @@ export class ExpenseController {
   }
 
   @Get('expenses/:id')
-  async detail(@Param('id') id: string) {
-    return this.expenseService.detail(id);
+  async detail(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.expenseService.detail(id, user.userId);
   }
 
   @Put('expenses/:id')

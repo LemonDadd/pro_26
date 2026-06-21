@@ -68,7 +68,7 @@ export declare class ExpenseController {
         pageSize: number;
         hasMore: boolean;
     }>;
-    detail(id: string): Promise<{
+    detail(id: string, user: JwtPayload): Promise<{
         id: string;
         tripId: string;
         amount: number;

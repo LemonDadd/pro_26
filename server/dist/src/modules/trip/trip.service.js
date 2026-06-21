@@ -204,6 +204,7 @@ let TripService = class TripService {
             })),
             stats: {
                 totalExpense: (0, aa_calculator_1.getTotalExpense)(expenses),
+                avgPerPerson: (0, aa_calculator_1.getAveragePerPerson)(expenses, trip.members?.length ?? 0),
                 expenseCount: expenses.length,
                 memberCount: trip.members?.length ?? 0,
             },

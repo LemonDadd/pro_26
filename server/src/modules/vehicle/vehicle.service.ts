@@ -49,12 +49,13 @@ export class VehicleService {
     };
   }
 
-  async detail(id: string) {
+  async detail(id: string, userId: string) {
     const vehicle = await this.prisma.vehicle.findUnique({
       where: { id },
       include: { owner: { select: { id: true, nickname: true, avatar: true } } },
     });
     if (!vehicle) throwBiz(ErrorCodes.VEHICLE_NOT_FOUND);
+    await this.ensureTripMember(vehicle.tripId, userId);
     return this.formatVehicle(vehicle);
   }
 
@@ -73,9 +74,10 @@ export class VehicleService {
     return this.formatVehicle(vehicle);
   }
 
-  async update(id: string, dto: UpdateVehicleDto) {
+  async update(id: string, userId: string, dto: UpdateVehicleDto) {
     const exists = await this.prisma.vehicle.findUnique({ where: { id } });
     if (!exists) throwBiz(ErrorCodes.VEHICLE_NOT_FOUND);
+    await this.ensureTripMember(exists.tripId, userId);
     const vehicle = await this.prisma.vehicle.update({
       where: { id },
       data: {
@@ -89,11 +91,21 @@ export class VehicleService {
     return this.formatVehicle(vehicle);
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     const exists = await this.prisma.vehicle.findUnique({ where: { id } });
     if (!exists) throwBiz(ErrorCodes.VEHICLE_NOT_FOUND);
+    await this.ensureTripMember(exists.tripId, userId);
     await this.prisma.vehicle.delete({ where: { id } });
     return { id };
+  }
+
+  private async ensureTripMember(tripId: string, userId: string) {
+    const membership = await this.prisma.tripMember.findUnique({
+      where: { tripId_userId: { tripId, userId } },
+    });
+    if (!membership || membership.status !== 'active') {
+      throwBiz(ErrorCodes.FORBIDDEN, '您不是该行程的成员');
+    }
   }
 
   async createFuelSubsidy(tripId: string, userId: string, dto: CreateFuelSubsidyDto) {

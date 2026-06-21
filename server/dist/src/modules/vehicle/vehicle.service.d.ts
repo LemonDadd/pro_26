@@ -26,7 +26,7 @@ export declare class VehicleService {
         }[];
         total: number;
     }>;
-    detail(id: string): Promise<{
+    detail(id: string, userId: string): Promise<{
         id: string;
         tripId: string;
         plateNumber: string | null;
@@ -50,7 +50,7 @@ export declare class VehicleService {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    update(id: string, dto: UpdateVehicleDto): Promise<{
+    update(id: string, userId: string, dto: UpdateVehicleDto): Promise<{
         id: string;
         tripId: string;
         plateNumber: string | null;
@@ -62,9 +62,10 @@ export declare class VehicleService {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    remove(id: string): Promise<{
+    remove(id: string, userId: string): Promise<{
         id: string;
     }>;
+    private ensureTripMember;
     createFuelSubsidy(tripId: string, userId: string, dto: CreateFuelSubsidyDto): Promise<{
         id: string;
         expenseId: string;

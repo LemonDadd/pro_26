@@ -40,6 +40,7 @@ export declare class TripService {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };
@@ -94,6 +95,7 @@ export declare class TripService {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };
@@ -127,6 +129,7 @@ export declare class TripService {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };

@@ -36,18 +36,22 @@ export class VehicleController {
   }
 
   @Get('vehicles/:id')
-  async detail(@Param('id') id: string) {
-    return this.vehicleService.detail(id);
+  async detail(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.vehicleService.detail(id, user.userId);
   }
 
   @Put('vehicles/:id')
-  async update(@Param('id') id: string, @Body() dto: UpdateVehicleDto) {
-    return this.vehicleService.update(id, dto);
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateVehicleDto,
+  ) {
+    return this.vehicleService.update(id, user.userId, dto);
   }
 
   @Delete('vehicles/:id')
-  async remove(@Param('id') id: string) {
-    return this.vehicleService.remove(id);
+  async remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.vehicleService.remove(id, user.userId);
   }
 
   @Post('trips/:tripId/fuel-subsidy')

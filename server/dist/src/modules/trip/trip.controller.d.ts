@@ -37,6 +37,7 @@ export declare class TripController {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };
@@ -95,6 +96,7 @@ export declare class TripController {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };
@@ -132,6 +134,7 @@ export declare class TripController {
         }[];
         stats: {
             totalExpense: number;
+            avgPerPerson: number;
             expenseCount: number;
             memberCount: number;
         };

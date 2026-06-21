@@ -135,37 +135,40 @@ export class ExpenseService {
     };
   }
 
-  async detail(id: string) {
+  async detail(id: string, userId: string) {
     const expense = await this.prisma.expense.findUnique({
       where: { id },
       include: this.detailInclude(),
     });
     if (!expense) throwBiz(ErrorCodes.EXPENSE_NOT_FOUND);
+    await this.ensureTripMember(expense.tripId, userId);
     return this.formatExpense(expense);
   }
 
   async update(id: string, userId: string, dto: UpdateExpenseDto) {
     const expense = await this.prisma.expense.findUnique({ where: { id } });
     if (!expense) throwBiz(ErrorCodes.EXPENSE_NOT_FOUND);
+    await this.ensureTripMember(expense.tripId, userId);
 
     const splitType = dto.splitType ?? expense.splitType;
-    let cnyAmount = expense.amount;
-    let originalAmount = expense.originalAmount;
-    let currency = expense.currency;
-    let rate = expense.exchangeRate;
+    const currency = dto.currency ?? expense.currency;
+    const rate = dto.exchangeRate ?? expense.exchangeRate;
 
-    if (dto.currency) {
-      currency = dto.currency;
-      rate = dto.exchangeRate ?? rate;
-    }
-    if (dto.amount !== undefined) {
-      if (currency === 'CNY') {
-        cnyAmount = dto.amount;
-        originalAmount = null;
-      } else {
-        originalAmount = dto.amount;
-        cnyAmount = round2(dto.amount * rate);
-      }
+    const baseAmount =
+      dto.amount !== undefined
+        ? dto.amount
+        : currency === 'CNY'
+          ? expense.amount
+          : (expense.originalAmount ?? expense.amount);
+
+    let cnyAmount: number;
+    let originalAmount: number | null;
+    if (currency === 'CNY') {
+      cnyAmount = round2(baseAmount);
+      originalAmount = null;
+    } else {
+      originalAmount = round2(baseAmount);
+      cnyAmount = round2(baseAmount * rate);
     }
 
     if (dto.participants || dto.splits || dto.splitType) {
@@ -214,15 +217,25 @@ export class ExpenseService {
   async remove(id: string, userId: string) {
     const expense = await this.prisma.expense.findUnique({ where: { id } });
     if (!expense) throwBiz(ErrorCodes.EXPENSE_NOT_FOUND);
+    await this.ensureTripMember(expense.tripId, userId);
     await this.prisma.expense.delete({ where: { id } });
     await this.activityService.add(
       expense.tripId,
       userId,
       'expense',
       `删除了费用：${expense.description}`,
-      -expense.amount,
+      expense.amount,
     );
     return { id };
+  }
+
+  private async ensureTripMember(tripId: string, userId: string) {
+    const membership = await this.prisma.tripMember.findUnique({
+      where: { tripId_userId: { tripId, userId } },
+    });
+    if (!membership || membership.status !== 'active') {
+      throwBiz(ErrorCodes.FORBIDDEN, '您不是该行程的成员');
+    }
   }
 
   private detailInclude() {

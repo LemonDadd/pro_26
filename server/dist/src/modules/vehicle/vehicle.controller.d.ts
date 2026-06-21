@@ -40,7 +40,7 @@ export declare class VehicleController {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    detail(id: string): Promise<{
+    detail(id: string, user: JwtPayload): Promise<{
         id: string;
         tripId: string;
         plateNumber: string | null;
@@ -56,7 +56,7 @@ export declare class VehicleController {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    update(id: string, dto: UpdateVehicleDto): Promise<{
+    update(id: string, user: JwtPayload, dto: UpdateVehicleDto): Promise<{
         id: string;
         tripId: string;
         plateNumber: string | null;
@@ -72,7 +72,7 @@ export declare class VehicleController {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    remove(id: string): Promise<{
+    remove(id: string, user: JwtPayload): Promise<{
         id: string;
     }>;
     fuelSubsidy(tripId: string, user: JwtPayload, dto: CreateFuelSubsidyDto): Promise<{

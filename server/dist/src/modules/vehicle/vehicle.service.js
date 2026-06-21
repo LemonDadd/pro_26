@@ -42,13 +42,14 @@ let VehicleService = class VehicleService {
             total: vehicles.length,
         };
     }
-    async detail(id) {
+    async detail(id, userId) {
         const vehicle = await this.prisma.vehicle.findUnique({
             where: { id },
             include: { owner: { select: { id: true, nickname: true, avatar: true } } },
         });
         if (!vehicle)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.VEHICLE_NOT_FOUND);
+        await this.ensureTripMember(vehicle.tripId, userId);
         return this.formatVehicle(vehicle);
     }
     async create(tripId, dto) {
@@ -65,10 +66,11 @@ let VehicleService = class VehicleService {
         });
         return this.formatVehicle(vehicle);
     }
-    async update(id, dto) {
+    async update(id, userId, dto) {
         const exists = await this.prisma.vehicle.findUnique({ where: { id } });
         if (!exists)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.VEHICLE_NOT_FOUND);
+        await this.ensureTripMember(exists.tripId, userId);
         const vehicle = await this.prisma.vehicle.update({
             where: { id },
             data: {
@@ -81,12 +83,21 @@ let VehicleService = class VehicleService {
         });
         return this.formatVehicle(vehicle);
     }
-    async remove(id) {
+    async remove(id, userId) {
         const exists = await this.prisma.vehicle.findUnique({ where: { id } });
         if (!exists)
             (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.VEHICLE_NOT_FOUND);
+        await this.ensureTripMember(exists.tripId, userId);
         await this.prisma.vehicle.delete({ where: { id } });
         return { id };
+    }
+    async ensureTripMember(tripId, userId) {
+        const membership = await this.prisma.tripMember.findUnique({
+            where: { tripId_userId: { tripId, userId } },
+        });
+        if (!membership || membership.status !== 'active') {
+            (0, business_exception_1.throwBiz)(business_exception_1.ErrorCodes.FORBIDDEN, '您不是该行程的成员');
+        }
     }
     async createFuelSubsidy(tripId, userId, dto) {
         const vehicle = await this.prisma.vehicle.findUnique({

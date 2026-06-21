@@ -67,7 +67,7 @@ export declare class ExpenseService {
         pageSize: number;
         hasMore: boolean;
     }>;
-    detail(id: string): Promise<{
+    detail(id: string, userId: string): Promise<{
         id: string;
         tripId: string;
         amount: number;
@@ -120,6 +120,7 @@ export declare class ExpenseService {
     remove(id: string, userId: string): Promise<{
         id: string;
     }>;
+    private ensureTripMember;
     private detailInclude;
     private formatExpense;
 }

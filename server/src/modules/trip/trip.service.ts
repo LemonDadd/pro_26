@@ -220,6 +220,10 @@ export class TripService {
       })),
       stats: {
         totalExpense: getTotalExpense(expenses),
+        avgPerPerson: getAveragePerPerson(
+          expenses,
+          trip.members?.length ?? 0,
+        ),
         expenseCount: expenses.length,
         memberCount: trip.members?.length ?? 0,
       },

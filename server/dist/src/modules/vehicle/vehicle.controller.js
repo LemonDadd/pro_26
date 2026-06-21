@@ -29,14 +29,14 @@ let VehicleController = class VehicleController {
     async create(tripId, dto) {
         return this.vehicleService.create(tripId, dto);
     }
-    async detail(id) {
-        return this.vehicleService.detail(id);
+    async detail(id, user) {
+        return this.vehicleService.detail(id, user.userId);
     }
-    async update(id, dto) {
-        return this.vehicleService.update(id, dto);
+    async update(id, user, dto) {
+        return this.vehicleService.update(id, user.userId, dto);
     }
-    async remove(id) {
-        return this.vehicleService.remove(id);
+    async remove(id, user) {
+        return this.vehicleService.remove(id, user.userId);
     }
     async fuelSubsidy(tripId, user, dto) {
         return this.vehicleService.createFuelSubsidy(tripId, user.userId, dto);
@@ -66,23 +66,26 @@ __decorate([
 __decorate([
     (0, common_1.Get)('vehicles/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "detail", null);
 __decorate([
     (0, common_1.Put)('vehicles/:id'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, vehicle_dto_1.UpdateVehicleDto]),
+    __metadata("design:paramtypes", [String, Object, vehicle_dto_1.UpdateVehicleDto]),
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)('vehicles/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "remove", null);
 __decorate([

@@ -29,8 +29,8 @@ let ExpenseController = class ExpenseController {
     async list(tripId, query, page = '1', pageSize = '20') {
         return this.expenseService.list(tripId, query, Number(page), Number(pageSize));
     }
-    async detail(id) {
-        return this.expenseService.detail(id);
+    async detail(id, user) {
+        return this.expenseService.detail(id, user.userId);
     }
     async update(id, user, dto) {
         return this.expenseService.update(id, user.userId, dto);
@@ -64,8 +64,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('expenses/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ExpenseController.prototype, "detail", null);
 __decorate([
