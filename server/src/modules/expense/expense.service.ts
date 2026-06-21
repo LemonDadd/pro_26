@@ -221,7 +221,9 @@ export class ExpenseService {
   private detailInclude() {
     return {
       payer: { select: { id: true, nickname: true, avatar: true } },
-      splits: true,
+      splits: {
+        include: { user: { select: { id: true, nickname: true, avatar: true } } },
+      },
     } as const;
   }
 
@@ -245,6 +247,8 @@ export class ExpenseService {
       payer: e.payer,
       participants: (e.splits ?? []).map((s: any) => ({
         id: s.userId,
+        nickname: s.user?.nickname,
+        avatar: s.user?.avatar,
         splitAmount: s.amount,
         ...(s.percentage != null ? { percentage: s.percentage } : {}),
       })),

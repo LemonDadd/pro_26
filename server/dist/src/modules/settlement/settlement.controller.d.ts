@@ -1,10 +1,5 @@
 import { SettlementService } from './settlement.service';
 import { JwtPayload } from '@/common/decorators/current-user.decorator';
-declare class SettleDto {
-    fromUserId: string;
-    toUserId: string;
-    amount: number;
-}
 export declare class SettlementController {
     private readonly settlementService;
     constructor(settlementService: SettlementService);
@@ -39,9 +34,10 @@ export declare class SettlementController {
             } | undefined;
             amount: number;
             status: string;
+            settledAt: number | null;
         }[];
     }>;
-    settle(tripId: string, user: JwtPayload, dto: SettleDto): Promise<{
+    settle(id: string, user: JwtPayload): Promise<{
         id: any;
         status: string;
     }>;
@@ -51,4 +47,3 @@ export declare class SettlementController {
         qrCodeUrl: string;
     }>;
 }
-export {};

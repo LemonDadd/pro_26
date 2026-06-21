@@ -21,7 +21,7 @@ export class TripAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const tripId = req.params.tripId || req.params.id;
+    const tripId = req.params.tripId;
     const user = req.user as { userId: string } | undefined;
 
     const config = this.reflector.get<{ requireLeader?: boolean }>(

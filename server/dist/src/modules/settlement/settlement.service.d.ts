@@ -1,10 +1,15 @@
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ActivityService } from '@/modules/activity/activity.service';
 export declare class SettlementService {
     private readonly prisma;
     private readonly activityService;
-    constructor(prisma: PrismaService, activityService: ActivityService);
+    private readonly configService;
+    constructor(prisma: PrismaService, activityService: ActivityService, configService: ConfigService);
     private toExpenseLike;
+    private makePlanId;
+    private parsePlanId;
+    private ensureTripMember;
     compute(tripId: string): Promise<{
         totalExpense: number;
         memberCount: number;
@@ -36,13 +41,10 @@ export declare class SettlementService {
             } | undefined;
             amount: number;
             status: string;
+            settledAt: number | null;
         }[];
     }>;
-    settle(tripId: string, userId: string, data: {
-        fromUserId: string;
-        toUserId: string;
-        amount: number;
-    }): Promise<{
+    settle(id: string, userId: string): Promise<{
         id: any;
         status: string;
     }>;

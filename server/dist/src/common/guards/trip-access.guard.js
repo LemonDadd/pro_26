@@ -24,7 +24,7 @@ let TripAccessGuard = class TripAccessGuard {
     }
     async canActivate(context) {
         const req = context.switchToHttp().getRequest();
-        const tripId = req.params.tripId || req.params.id;
+        const tripId = req.params.tripId;
         const user = req.user;
         const config = this.reflector.get(exports.TRIP_ACCESS_KEY, context.getHandler());
         if (!tripId || !user) {

@@ -177,7 +177,9 @@ let ExpenseService = class ExpenseService {
     detailInclude() {
         return {
             payer: { select: { id: true, nickname: true, avatar: true } },
-            splits: true,
+            splits: {
+                include: { user: { select: { id: true, nickname: true, avatar: true } } },
+            },
         };
     }
     formatExpense(e) {
@@ -200,6 +202,8 @@ let ExpenseService = class ExpenseService {
             payer: e.payer,
             participants: (e.splits ?? []).map((s) => ({
                 id: s.userId,
+                nickname: s.user?.nickname,
+                avatar: s.user?.avatar,
                 splitAmount: s.amount,
                 ...(s.percentage != null ? { percentage: s.percentage } : {}),
             })),
